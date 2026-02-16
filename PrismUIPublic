@@ -1,0 +1,2077 @@
+local function __BUNDLED_PrismUI__()local a={}if getgenv then if not getgenv().
+PrismWindows then getgenv().PrismWindows={}end a=getgenv().PrismWindows end
+local b={Version='6.8',Windows=a,Settings={FontSize=14},LogHistory={},Keybinds={
+},_keybindConnection=nil::RBXScriptConnection?}local c=cloneref or function(c)
+return c end local d=c(game:GetService('Players'))local e=c(game:GetService(
+'UserInputService'))local f=c(game:GetService('RunService'))local g=c(game:
+GetService('CoreGui'))local h=c(game:GetService('HttpService'))local i=d.
+LocalPlayer local j=230 local k=220 local l=10 local m=30 local n=28 local o=90
+local p=6 function b:GetFontSize(q)local r=b.Settings.FontSize or 14 return r
+end local q={Matrix={name='Matrix',bg=Color3.fromRGB(0,0,0),panel=Color3.
+fromRGB(15,15,15),element=Color3.fromRGB(30,30,30),accent=Color3.fromRGB(0,255,
+120),text=Color3.fromRGB(200,255,220),textDim=Color3.fromRGB(0,150,70),border=
+Color3.fromRGB(0,255,120),on=Color3.fromRGB(0,255,120),off=Color3.fromRGB(30,30,
+30),error=Color3.fromRGB(255,70,70),warning=Color3.fromRGB(255,200,0),rounding=0
+,padding=10,glow=true},Dark={name='Dark',bg=Color3.fromRGB(18,18,22),panel=
+Color3.fromRGB(26,26,32),element=Color3.fromRGB(38,38,46),accent=Color3.fromRGB(
+80,100,220),text=Color3.fromRGB(220,220,230),textDim=Color3.fromRGB(120,120,140)
+,border=Color3.fromRGB(50,50,70),on=Color3.fromRGB(80,100,220),off=Color3.
+fromRGB(50,50,60),error=Color3.fromRGB(200,60,60),warning=Color3.fromRGB(200,140
+,30),rounding=4},Ocean={name='Ocean',bg=Color3.fromRGB(12,18,26),panel=Color3.
+fromRGB(20,32,44),element=Color3.fromRGB(30,48,64),accent=Color3.fromRGB(40,160,
+220),text=Color3.fromRGB(210,230,240),textDim=Color3.fromRGB(90,130,160),border=
+Color3.fromRGB(30,70,100),on=Color3.fromRGB(40,160,220),off=Color3.fromRGB(30,50
+,70),error=Color3.fromRGB(200,70,70),warning=Color3.fromRGB(200,160,50),rounding
+=4},Custom={name='Custom',bg=Color3.fromRGB(20,20,20),panel=Color3.fromRGB(30,30
+,30),element=Color3.fromRGB(45,45,45),accent=Color3.fromRGB(255,255,255),text=
+Color3.fromRGB(255,255,255),textDim=Color3.fromRGB(150,150,150),border=Color3.
+fromRGB(60,60,60),on=Color3.fromRGB(255,255,255),off=Color3.fromRGB(45,45,45),
+error=Color3.fromRGB(255,50,50),warning=Color3.fromRGB(255,200,0),rounding=4,
+padding=10,glow=false}}local r=q.Matrix b.Themes=q function b:GetTheme()return r
+end local s=true function b:Save(t,u)b.Settings[t]=u pcall(function()if
+writefile then if not isfolder('Prism')then makefolder('Prism')end writefile(
+'Prism/settings.json',h:JSONEncode(b.Settings))end end)if t=='theme'then r=q[u]
+or q.Matrix b:UpdateWindows()elseif t=='layout'then s=(u=='Horizontal')b:
+UpdateWindows('LayoutChange')elseif t=='FontSize'then b:UpdateWindows()elseif t
+=='CustomTheme'then local v={}for w,x in pairs(u)do if typeof(x)=='Color3'then v
+[w]={r=x.R,g=x.G,b=x.B}else v[w]=x end end b.Settings[t]=v q.Custom=u if b.
+Settings.theme=='Custom'then r=q.Custom b:UpdateWindows()end end end function b:
+Load(t,u)if b.Settings[t]~=nil then return b.Settings[t]end pcall(function()if
+readfile and isfile and isfile('Prism/settings.json')then b.Settings=h:
+JSONDecode(readfile('Prism/settings.json'))if(b.Settings::any).CustomTheme then
+for v,w in pairs((b.Settings::any).CustomTheme)do if type(w)=='table'and w.r
+then q.Custom[v]=Color3.new(w.r,w.g,w.b)else q.Custom[v]=w end end end end end)
+return b.Settings[t]~=nil and b.Settings[t]or u end function b:UpdateWindows(t)
+for u,v in ipairs(b.Windows)do if v.Update then v:Update()end if t==
+'LayoutChange'and v.AdaptToLayout then v:AdaptToLayout()end end end task.spawn(
+function()while true do pcall(function()if readfile and isfile(
+'Prism/settings.json')then local t=h:JSONDecode(readfile('Prism/settings.json'))
+local u=false local v=false if t.theme and t.theme~=r.name then if t.theme==
+'Custom'and t.CustomTheme then local w={}for x,y in pairs(t.CustomTheme)do if
+type(y)=='table'and y.r then w[x]=Color3.new(y.r,y.g,y.b)else w[x]=y end end q.
+Custom=w end r=q[t.theme]or q.Matrix b.Settings.theme=t.theme u=true end if t.
+layout then local w=(t.layout=='Horizontal')if w~=s then s=w b.Settings.layout=t
+.layout u=true v=true end end if u then b:UpdateWindows(v and'LayoutChange'or
+nil)end end end)task.wait(1)end end)local t=print local u=warn local v=error
+function b:Log(w,x)local y=os.date('%H:%M:%S')local z=(b.Settings::any).
+MaxLogHistory or 1000 table.insert(b.LogHistory,{Time=y,Message=w,Type=x or
+'Info'})if#b.LogHistory>z then table.remove(b.LogHistory,1)end for A,B in
+ipairs(b.Windows)do if B.LogHistory then table.insert(B.LogHistory,{Time=y,
+Message=w,Type=x or'Info'})if#B.LogHistory>z then table.remove(B.LogHistory,1)
+end end if B.UpdateLog then B:UpdateLog()end end end function b:HookLogs()local
+w=(getgenv and getgenv())or _G if w.PrismLogHooked then return end w.
+PrismLogHooked=true local x=w.print or print local y=w.warn or warn local z=w.
+error or error t=x u=y v=z w.print=function(...)local A={...}local B=''for C,D
+in ipairs(A)do B=B..tostring(D)..' 'end b:Log(B,'Info')end w.warn=function(...)
+local A={...}local B=''for C,D in ipairs(A)do B=B..tostring(D)..' 'end b:Log(B,
+'Warning')end w.error=function(...)local A={...}local B=''for C,D in ipairs(A)do
+B=B..tostring(D)..' 'end b:Log(B,'Error')z(...)end end function b:UnhookLogs()
+rawset(_G,'print',t)rawset(_G,'warn',u)rawset(_G,'error',v)if getgenv then
+getgenv().PrismLogHooked=false end end function b:RegisterKeybind(w)if not w or
+not w.Id or not w.Key or not w.Callback then warn(
+[[[PrismUI] RegisterKeybind: Missing required fields (Id, Key, Callback)]])
+return end b.Keybinds[w.Id]={Key=w.Key,Modifiers=w.Modifiers or{},Callback=w.
+Callback,Description=w.Description or''}if not b._keybindConnection then b.
+_keybindConnection=e.InputBegan:Connect(function(x,y)if y then return end for z,
+A in pairs(b.Keybinds)do if x.KeyCode==A.Key then local B=true for C,D in
+ipairs(A.Modifiers)do if not e:IsKeyDown(D)then B=false break end end if B and#A
+.Modifiers==0 then local C={Enum.KeyCode.LeftControl,Enum.KeyCode.RightControl,
+Enum.KeyCode.LeftShift,Enum.KeyCode.RightShift,Enum.KeyCode.LeftAlt,Enum.KeyCode
+.RightAlt}for D,E in ipairs(C)do if e:IsKeyDown(E)then B=false break end end end
+if B then task.spawn(A.Callback)end end end end)end end function b:
+UnregisterKeybind(w)if not w then return end b.Keybinds[w]=nil if next(b.
+Keybinds)==nil and b._keybindConnection then b._keybindConnection:Disconnect()b.
+_keybindConnection=nil end end function b:ClearKeybinds()b.Keybinds={}if b.
+_keybindConnection then b._keybindConnection:Disconnect()b._keybindConnection=
+nil end end local w={}function w.new(x,y)local z=Instance.new(x)for A,B in
+pairs(y or{})do z[A]=B end return z end function w.corner(x,y)w.new('UICorner',{
+CornerRadius=UDim.new(0,y or r.rounding or 4),Parent=x})end function w.stroke(x,
+y,z)return w.new('UIStroke',{Color=y or r.border,Thickness=z or 1,Parent=x})end
+function w.list(x,y,z)return w.new('UIListLayout',{FillDirection=y or Enum.
+FillDirection.Vertical,Padding=UDim.new(0,z or 4),SortOrder=Enum.SortOrder.
+LayoutOrder,Parent=x})end function w.pad(x,y)w.new('UIPadding',{PaddingTop=UDim.
+new(0,y),PaddingBottom=UDim.new(0,y),PaddingLeft=UDim.new(0,y),PaddingRight=UDim
+.new(0,y),Parent=x})end function w.drag(x,y)local z,A,B y.InputBegan:Connect(
+function(C)if C.UserInputType==Enum.UserInputType.MouseButton1 or C.
+UserInputType==Enum.UserInputType.Touch then z=true A=C.Position B=x.Position
+local D=x:FindFirstAncestorWhichIsA('ScreenGui')if D then D.DisplayOrder=tick()%
+10000 end end end)e.InputChanged:Connect(function(C)if z and(C.UserInputType==
+Enum.UserInputType.MouseMovement or C.UserInputType==Enum.UserInputType.Touch)
+then local D=C.Position-A x.Position=UDim2.new(B.X.Scale,B.X.Offset+D.X,B.Y.
+Scale,B.Y.Offset+D.Y)end end)e.InputEnded:Connect(function(C)if C.UserInputType
+==Enum.UserInputType.MouseButton1 or C.UserInputType==Enum.UserInputType.Touch
+then z=false end end)end local function getLuminance(x)local y,z,A=x.R,x.G,x.B
+local function adjust(B)return B<=0.03928 and B/12.92 or((B+0.055)/1.055)^2.4
+end return 0.2126*adjust(y)+0.7152*adjust(z)+0.0722*adjust(A)end function w.
+contrast(x,y,z)if not x then return y end local A=getLuminance(x)local B=
+getLuminance(y)local C=getLuminance(z)local function ratio(D,E)local F=math.max(
+D,E)local G=math.min(D,E)return(F+0.05)/(G+0.05)end local D=ratio(A,B)local E=
+ratio(A,C)return D>E and y or z end function b:CreateWindow(x)local y=x.Name or
+'Prism UI'for z,A in ipairs(b.Windows)do if A.Name==y then if A.OnCloseCallbacks
+then for B,C in ipairs(A.OnCloseCallbacks)do pcall(C)end end if A.Main and A.
+Main.Parent and A.Main.Parent.Parent then A.Main.Parent:Destroy()elseif A.Main
+then A.Main:Destroy()end table.remove(b.Windows,z)end end local z=b:Load('theme'
+,'Matrix')r=q[z]or q.Matrix local A=b:Load('layout','Horizontal')s=(A==
+'Horizontal')local B=b:Load('FontSize',14)b.Settings.FontSize=B local C={Name=y,
+Items={},Tabs={},ActiveTab=nil,LastActiveTab=nil,OnCloseCallbacks={},LogHistory=
+{},LogWindowInstance=nil,ThemeButtons={},LayoutButtons={}}function C:
+CloseAllDropdowns()for D,E in ipairs(C.Items)do if E.Type=='Dropdown'and E.Drop
+then E.Drop.Visible=false end end end local D=w.new('ScreenGui',{Name=h:
+GenerateGUID(false),ResetOnSpawn=false,ZIndexBehavior=Enum.ZIndexBehavior.
+Sibling})local E=w.new('Frame',{Name='Overlay',Size=UDim2.new(1,0,1,0),Position=
+UDim2.new(0,0,0,0),BackgroundTransparency=1,ZIndex=1000,Parent=D})local F=false
+if gethui then pcall(function()D.Parent=gethui()F=true end)end if not F and syn
+and syn.protect_gui then pcall(function()syn.protect_gui(D)D.Parent=g F=true end
+)end if not F then pcall(function()D.Parent=g end)end if not D.Parent then D.
+Parent=i:WaitForChild('PlayerGui')end local G=w.new('Frame',{Name='GhostResize',
+BackgroundTransparency=1,Visible=false,ZIndex=999,Parent=D})w.corner(G,0)w.new(
+'UIStroke',{Color=Color3.fromRGB(200,200,200),Thickness=2,Transparency=0.5,
+Parent=G})local function GetChromeWidth()return(s and l or(o+l+l))+p end
+local function SnapDimensions(H,I)local J=GetChromeWidth()local K=H-J local L=
+math.max(1,math.floor(K/j))local M=(L*j)+J return M,math.max(200,I),L end local
+H=2 local I=(H*j)+GetChromeWidth()local J=j+m+n+l local K=w.new('Frame',{Size=
+UDim2.new(0,I,0,J),Position=UDim2.new(0.5,-I/2,0.5,-J/2),Parent=D,
+ClipsDescendants=true})C.Main=K w.corner(K,0)local L=w.stroke(K,r.border)local M
+=w.new('Frame',{Size=UDim2.new(1,0,0,m),Parent=K})w.corner(M,0)local N=w.new(
+'Frame',{Size=UDim2.new(1,0,0,8),Position=UDim2.new(0,0,1,-8),BorderSizePixel=0,
+Parent=M})local O=w.new('TextLabel',{Size=UDim2.new(0.6,0,1,0),Position=UDim2.
+new(0,10,0,0),BackgroundTransparency=1,Text=x.Name or'Prism',TextSize=12,Font=
+Enum.Font.GothamBold,TextXAlignment=Enum.TextXAlignment.Left,Parent=M})local P=w
+.new('TextButton',{Size=UDim2.new(0,22,0,22),Position=UDim2.new(1,-24,0.5,-11),
+BackgroundTransparency=1,Text='\u{d7}',TextSize=16,Font=Enum.Font.GothamBold,
+Parent=M})local Q=w.new('TextButton',{Size=UDim2.new(0,22,0,22),Position=UDim2.
+new(1,-46,0.5,-11),BackgroundTransparency=1,Text='\u{2212}',TextSize=16,Font=
+Enum.Font.GothamBold,Parent=M})local R=w.new('TextButton',{Size=UDim2.new(0,22,0
+,22),Position=UDim2.new(1,-68,0.5,-11),BackgroundTransparency=1,Text='\u{2699}',
+TextSize=14,Font=Enum.Font.GothamBold,Parent=M})local S=w.new('TextButton',{Size
+=UDim2.new(0,22,0,22),Position=UDim2.new(1,-90,0.5,-11),BackgroundTransparency=1
+,Text='\u{1f4dd}',TextSize=14,Font=Enum.Font.GothamBold,Parent=M})w.drag(K,M)
+local T=w.new('TextButton',{Size=UDim2.new(0,14,0,14),Position=UDim2.new(1,-14,1
+,-14),BackgroundTransparency=1,Text='\u{25e2}',TextSize=10,ZIndex=100,Parent=K})
+local U=false T.MouseButton1Down:Connect(function()U=true G.Size=K.Size G.
+Position=K.Position G.Visible=true end)e.InputChanged:Connect(function(V)if U
+and V.UserInputType==Enum.UserInputType.MouseMovement then local W=e:
+GetMouseLocation()local X=W.X-K.AbsolutePosition.X local Y=W.Y-K.
+AbsolutePosition.Y G.Size=UDim2.new(0,math.max(200,X),0,math.max(200,Y))local Z,
+_=SnapDimensions(X,Y)if K.AbsoluteSize.X~=Z or K.AbsoluteSize.Y~=_ then K.Size=
+UDim2.new(0,Z,0,_)if C.ActiveTab then C.ActiveTab:Reflow()end end end end)e.
+InputEnded:Connect(function(V)if V.UserInputType==Enum.UserInputType.
+MouseButton1 then U=false G.Visible=false end end)function C:AdaptToLayout()
+local V,W,X=SnapDimensions(K.AbsoluteSize.X,K.AbsoluteSize.Y)local Y=(X*j)+
+GetChromeWidth()K.Size=UDim2.new(0,Y,0,K.AbsoluteSize.Y)C:Reflow()end local W=w.
+new('TextButton',{Size=UDim2.new(0,36,0,36),Position=UDim2.new(0,8,0.5,-18),Text
+=x.Icon or'P',TextSize=14,Font=Enum.Font.GothamBold,Visible=false,Parent=D})w.
+corner(W,0)local X=w.stroke(W,r.border)w.drag(W,W)Q.MouseButton1Click:Connect(
+function()C:CloseAllDropdowns()K.Visible=false W.Visible=true end)W.
+MouseButton1Click:Connect(function()K.Visible=true W.Visible=false end)if x.
+ToggleKey then e.InputBegan:Connect(function(Y,Z)if not Z and Y.KeyCode==x.
+ToggleKey then K.Visible=not K.Visible if not K.Visible then C:
+CloseAllDropdowns()W.Visible=true else W.Visible=false end end end)end function
+C:OnClose(Y)table.insert(C.OnCloseCallbacks,Y)end C.OnDestroy=C.OnClose P.
+MouseButton1Click:Connect(function()C:CloseAllDropdowns()for Y,Z in ipairs(C.
+OnCloseCallbacks)do pcall(Z)end D:Destroy()end)local Y=w.new('ScrollingFrame',{
+BackgroundTransparency=1,ScrollBarThickness=3,ScrollBarImageTransparency=0.5,
+AutomaticCanvasSize=Enum.AutomaticSize.X,CanvasSize=UDim2.new(0,0,0,0),
+ScrollingDirection=Enum.ScrollingDirection.X,ClipsDescendants=true,Parent=K})
+local Z=w.new('Frame',{BackgroundTransparency=1,ClipsDescendants=true,Parent=K})
+local _=w.list(Y,Enum.FillDirection.Horizontal,4)local function ReflowTab(aa)
+local ab=GetChromeWidth()local ac=K.AbsoluteSize.X-ab local ad=math.max(1,math.
+floor(ac/j))for ae,af in ipairs(aa.Panels)do if af.Frame then af.Frame.Parent=
+nil end end for ae,af in ipairs(aa.ColumnFrames)do af:Destroy()end aa.
+ColumnFrames={}aa.Heights={}for ae=1,ad do local af=w.new('Frame',{Size=UDim2.
+new(0,k,0,0),BackgroundTransparency=1,AutomaticSize=Enum.AutomaticSize.Y,Parent=
+aa.Container})w.list(af,Enum.FillDirection.Vertical,l)table.insert(aa.
+ColumnFrames,af)aa.Heights[ae]=0 end for ae,af in ipairs(aa.Panels)do local ag=1
+local ah=aa.Heights[1]for ai=2,ad do if aa.Heights[ai]<ah then ag=ai ah=aa.
+Heights[ai]end end af.Frame.Parent=aa.ColumnFrames[ag]local ai=af.Inner.
+AbsoluteSize.Y+12 if ai<24 then ai=50 end aa.Heights[ag]=aa.Heights[ag]+ai+l end
+local ae=0 for af,ag in ipairs(aa.Heights)do if ag>ae then ae=ag end end aa.
+Container.Size=UDim2.new(1,0,0,ae+l)aa.Scroll.CanvasSize=UDim2.new(0,0,0,ae+l*2)
+end function C:Reflow()if C.ActiveTab then ReflowTab(C.ActiveTab)end end K:
+GetPropertyChangedSignal('AbsoluteSize'):Connect(function()C:Reflow()end)
+function C:SetActive(aa)C:CloseAllDropdowns()if C.ActiveTab==aa then return end
+if C.ActiveTab and C.ActiveTab.Btn.Name~='Settings'then C.LastActiveTab=C.
+ActiveTab end for ab,ac in ipairs(C.Tabs)do ac.Scroll.Visible=false ac.Container
+.Visible=false end for ab,ac in ipairs(C.Items)do if ac.Type=='TabBtn'then ac.
+Active=(ac.Inst==aa.Btn)end end aa.Scroll.Visible=true aa.Container.Visible=true
+C.ActiveTab=aa C:Update()ReflowTab(aa)end function C:Update()local aa=r local ab
+=s local ac=b:GetFontSize()local function contrast(ad)return w.contrast(ad,
+Color3.new(1,1,1),Color3.new(0,0,0))end K.BackgroundColor3=aa.bg L.Color=aa.
+border local ad=K:FindFirstChild('UICorner')if ad then ad.CornerRadius=UDim.new(
+0,aa.rounding or 4)end M.BackgroundColor3=aa.panel local ae=M:FindFirstChild(
+'UICorner')if ae then ae.CornerRadius=UDim.new(0,aa.rounding or 4)end N.
+BackgroundColor3=aa.panel O.TextColor3=aa.text P.TextColor3=aa.accent Q.
+TextColor3=aa.accent R.TextColor3=aa.textDim S.TextColor3=aa.textDim T.
+TextColor3=aa.textDim W.BackgroundColor3=aa.panel W.TextColor3=aa.accent X.Color
+=aa.border if ab then Y.Parent=K Y.Size=UDim2.new(1,-l,0,n)Y.Position=UDim2.new(
+0,l/2,0,m+2)_.FillDirection=Enum.FillDirection.Horizontal Y.ScrollingDirection=
+Enum.ScrollingDirection.X Y.AutomaticCanvasSize=Enum.AutomaticSize.X Y.
+CanvasSize=UDim2.new(0,0,0,0)Z.Size=UDim2.new(1,-l,1,-(m+n+l+2))Z.Position=UDim2
+.new(0,l/2,0,m+n+4)else Y.Size=UDim2.new(0,o,1,-(m+l))Y.Position=UDim2.new(0,l/2
+,0,m+2)Y.ScrollingDirection=Enum.ScrollingDirection.Y Y.AutomaticCanvasSize=Enum
+.AutomaticSize.Y Y.CanvasSize=UDim2.new(0,0,0,0)_.FillDirection=Enum.
+FillDirection.Vertical Z.Size=UDim2.new(1,-(o+l+l),1,-(m+l))Z.Position=UDim2.
+new(0,o+l,0,m+2)end for af,ag in ipairs(C.Items)do if ag.Type=='TabBtn'then ag.
+Inst.TextColor3=ag.Active and aa.accent or aa.textDim if ab then ag.Inst.Size=
+UDim2.new(0,0,1,0)ag.Inst.AutomaticSize=Enum.AutomaticSize.X ag.Inst.
+BackgroundTransparency=1 ag.Inst.TextSize=ac local ah=ag.Inst:FindFirstChild(
+'Indicator')if ah then ah.Size=UDim2.new(1,-8,0,2)ah.Position=UDim2.new(0,4,1,-2
+)ah.Visible=ag.Active ah.BackgroundColor3=aa.accent end local ai=ag.Inst:
+FindFirstChild('UIPadding')if ai then ai.PaddingLeft=UDim.new(0,8)ai.
+PaddingRight=UDim.new(0,8)end else ag.Inst.Size=UDim2.new(1,-4,0,24)ag.Inst.
+AutomaticSize=Enum.AutomaticSize.None ag.Inst.BackgroundTransparency=0 local ah=
+ag.Inst:FindFirstChild('Indicator')if ah then ah.Size=UDim2.new(0,2,1,-8)ah.
+Position=UDim2.new(0,2,0,4)ah.Visible=ag.Active ah.BackgroundColor3=aa.accent
+end ag.Inst.BackgroundColor3=ag.Active and aa.accent or aa.element ag.Inst.
+TextColor3=ag.Active and contrast(aa.accent)or aa.textDim ag.Inst.TextSize=ac
+local ai=ag.Inst:FindFirstChild('UIPadding')if ai then ai.PaddingLeft=UDim.new(0
+,4)end end local ah=ag.Inst:FindFirstChild('UICorner')if ah then ah.CornerRadius
+=UDim.new(0,aa.rounding or 4)end elseif ag.Type=='Panel'then ag.Inst.
+BackgroundColor3=aa.panel ag.Stroke.Color=aa.border local ah=ag.Inst:
+FindFirstChild('UICorner')if ah then ah.CornerRadius=UDim.new(0,aa.rounding or 4
+)end if ag.Title then ag.Title.TextColor3=aa.text ag.Title.TextSize=ac end
+elseif ag.Type=='Button'then local ah=false if C.ThemeButtons[ag.Inst]==aa.name
+then ah=true elseif C.LayoutButtons[ag.Inst]==(ab and'Horizontal'or'Vertical')
+then ah=true end ag.Inst.BackgroundColor3=ah and aa.accent or aa.element ag.Inst
+.TextColor3=ah and contrast(aa.accent)or aa.text ag.Inst.TextSize=ac local ai=ag
+.Inst:FindFirstChild('UICorner')if ai then ai.CornerRadius=UDim.new(0,aa.
+rounding or 4)end elseif ag.Type=='DualButton'or ag.Type=='ActionRow'then local
+ah=ag.Inst:FindFirstChild('TextLabel')if ah then ah.TextColor3=aa.text ah.
+TextSize=ac end for ai,aj in pairs(ag.Inst:GetDescendants())do if aj:IsA(
+'TextButton')then aj.TextColor3=aa.text local ak=aj:FindFirstChild('UICorner')if
+ak then ak.CornerRadius=UDim.new(0,aa.rounding or 4)end end end elseif ag.Type==
+'Toggle'then ag.Box.BackgroundColor3=ag.Value and aa.on or aa.off ag.Label.
+TextColor3=aa.text ag.Label.TextSize=ac local ah=ag.Box:FindFirstChild(
+'UICorner')if ah then ah.CornerRadius=UDim.new(0,math.min(aa.rounding or 2,2))
+end elseif ag.Type=='Slider'then ag.Label.TextColor3=aa.text ag.Fill.
+BackgroundColor3=aa.on ag.Bar.BackgroundColor3=aa.off ag.Label.TextSize=ac local
+ah=ag.Bar:FindFirstChild('UICorner')if ah then ah.CornerRadius=UDim.new(0,aa.
+rounding or 4)end local ai=ag.Fill:FindFirstChild('UICorner')if ai then ai.
+CornerRadius=UDim.new(0,aa.rounding or 4)end elseif ag.Type=='Dropdown'then ag.
+Btn.BackgroundColor3=aa.element ag.Btn.TextColor3=aa.text ag.Btn.TextSize=b:
+GetFontSize('Small')ag.Drop.BackgroundColor3=aa.panel ag.Drop.BorderColor3=aa.
+accent local ah=ag.Btn:FindFirstChild('UICorner')if ah then ah.CornerRadius=UDim
+.new(0,aa.rounding or 4)end local ai=ag.Drop:FindFirstChild('UICorner')if ai
+then ai.CornerRadius=UDim.new(0,aa.rounding or 4)end if ag.Label then ag.Label.
+TextColor3=aa.textDim ag.Label.TextSize=ac end elseif ag.Type=='DropdownOpt'then
+ag.Inst.TextColor3=aa.text ag.Inst.TextSize=ac elseif ag.Type=='Label'then ag.
+Inst.TextColor3=aa.textDim ag.Inst.TextSize=ac elseif ag.Type=='AutoButton'then
+local ah=ag.GetVal and ag.GetVal()or false local ai=ah and aa.on or aa.element
+ag.Inst.BackgroundColor3=ai ag.Inst.Text=ah and'ON'or'Auto'ag.Inst.TextColor3=
+contrast(ai)local aj=ag.Inst:FindFirstChild('UICorner')if aj then aj.
+CornerRadius=UDim.new(0,aa.rounding or 4)end elseif ag.Type=='TextBox'then ag.
+Box.TextColor3=aa.text ag.Box.PlaceholderColor3=aa.textDim ag.Box.TextSize=ac
+local ah=ag.Box.Parent:FindFirstChild('UICorner')if ah then ah.CornerRadius=UDim
+.new(0,aa.rounding or 4)end local ai=ag.Inst:FindFirstChild('TextLabel')if ai
+then ai.TextColor3=aa.textDim ai.TextSize=ac end end end if C.ActiveTab then
+ReflowTab(C.ActiveTab)end end function C:CreateTab(aa,ab)local ac=w.new(
+'TextButton',{Text=aa or'Tab',Font=Enum.Font.GothamBold,TextSize=10,Parent=Y})w.
+new('UICorner',{CornerRadius=UDim.new(0,4),Parent=ac})w.pad(ac,4)local ad=w.new(
+'Frame',{Name='Indicator',Visible=false,BorderSizePixel=0,Parent=ac})if s then
+ad.Size=UDim2.new(1,-8,0,2)ad.Position=UDim2.new(0,4,1,-4)else ad.Size=UDim2.
+new(0,2,1,-8)ad.Position=UDim2.new(0,2,0,4)end local ae=w.new('ScrollingFrame',{
+Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScrollBarThickness=4,CanvasSize
+=UDim2.new(0,0,0,0),Visible=false,Parent=Z})local af=w.new('Frame',{Size=UDim2.
+new(1,0,0,0),BackgroundTransparency=1,AutomaticSize=Enum.AutomaticSize.Y,Parent=
+ae})w.list(af,Enum.FillDirection.Horizontal,l)w.pad(af,l)local ag={Btn=ac,Scroll
+=ae,Container=af,Panels={},ColumnFrames={},Heights={}}table.insert(C.Tabs,ag)
+table.insert(C.Items,{Type='TabBtn',Inst=ac,Active=false})ac.MouseButton1Click:
+Connect(function()C:SetActive(ag)end)if aa~='Settings'then local ah=false for ai
+,aj in ipairs(C.Tabs)do if aj~=ag and C.ActiveTab==aj then ah=true break end end
+if not ah then C:SetActive(ag)end end function ag:Panel(ah)local ai=w.new(
+'Frame',{Size=UDim2.new(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y})w.corner(ai
+,4)local aj=w.stroke(ai)local ak=w.new('Frame',{Size=UDim2.new(1,-12,0,0),
+Position=UDim2.new(0,6,0,6),BackgroundTransparency=1,AutomaticSize=Enum.
+AutomaticSize.Y,Parent=ai})w.list(ak,Enum.FillDirection.Vertical,4)local al if
+ah then al=w.new('TextLabel',{Size=UDim2.new(1,0,0,14),BackgroundTransparency=1,
+Text=ah,Font=Enum.Font.GothamBold,TextSize=10,TextXAlignment=Enum.TextXAlignment
+.Left,Parent=ak})end ak:GetPropertyChangedSignal('AbsoluteSize'):Connect(
+function()ai.Size=UDim2.new(1,0,0,ak.AbsoluteSize.Y+12)if C.ActiveTab==ag then
+ReflowTab(ag)end end)table.insert(ag.Panels,{Frame=ai,Inner=ak})table.insert(C.
+Items,{Type='Panel',Inst=ai,Stroke=aj,Title=al})local am={Inst=ai,Inner=ak}
+function am:Clear()for an,ao in ipairs(ak:GetChildren())do if ao:IsA(
+'UIConstraint')or ao:IsA('UILayout')or ao:IsA('UIPadding')then continue end for
+ap,aq in ipairs(C.Items)do if aq.Inst==ao or(aq.Box and aq.Box.Parent==ao)then
+table.remove(C.Items,ap)break end end ao:Destroy()end if C.ActiveTab==ag then
+ReflowTab(ag)end end function am:ProgressBar(an,ao)local ap=w.new('Frame',{Size=
+UDim2.new(1,0,0,24),BackgroundTransparency=1,Parent=ak})local aq=w.new(
+'TextLabel',{Size=UDim2.new(1,0,0,14),BackgroundTransparency=1,Text=an,Font=Enum
+.Font.Gotham,TextSize=b:GetFontSize('Small'),TextColor3=r.textDim,TextXAlignment
+=Enum.TextXAlignment.Left,Parent=ap})local ar=w.new('Frame',{Size=UDim2.new(1,0,
+0,6),Position=UDim2.new(0,0,1,-6),BackgroundColor3=r.off,BorderSizePixel=0,
+Parent=ap})w.corner(ar,3)local as=w.new('Frame',{Size=UDim2.new(ao or 0,0,1,0),
+BackgroundColor3=r.accent,BorderSizePixel=0,Parent=ar})w.corner(as,3)table.
+insert(C.Items,{Type='ProgressBar',Inst=ap,Label=aq,Bar=ar,Fill=as})return{Set=
+function(at,au)as.Size=UDim2.new(math.clamp(au,0,1),0,1,0)end,UpdateColor=
+function(at,au)as.BackgroundColor3=au end}end function am:Toggle(an,ao,ap)local
+aq=(type(an)=='table')and an or{Name=an,CurrentValue=ao,Callback=ap}local ar=aq.
+CurrentValue or false local as=w.new('Frame',{Size=UDim2.new(1,0,0,16),
+BackgroundTransparency=1,Parent=ak})local at=w.new('TextButton',{Size=UDim2.new(
+0,12,0,12),Position=UDim2.new(0,0,0.5,-6),Text='',Parent=as})w.corner(at,2)local
+au=w.new('TextLabel',{Size=UDim2.new(1,-18,1,0),Position=UDim2.new(0,18,0,0),
+BackgroundTransparency=1,Text=aq.Name,Font=Enum.Font.Gotham,TextSize=b:
+GetFontSize(),TextColor3=r.text,TextXAlignment=Enum.TextXAlignment.Left,Parent=
+as})local av={Type='Toggle',Box=at,Label=au,Value=ar}table.insert(C.Items,av)
+local function set(aw)ar=aw av.Value=aw at.BackgroundColor3=ar and r.on or r.off
+if aq.Callback then aq.Callback(ar)end end at.MouseButton1Click:Connect(function
+()set(not ar)end)at.BackgroundColor3=ar and r.on or r.off return{Set=function(aw
+,ax)set(ax)end}end function am:Button(an,ao)local ap=(type(an)=='table')and an
+or{Name=an,Callback=ao}local aq=w.new('TextButton',{Size=UDim2.new(1,0,0,20),
+Text=ap.Name,Font=Enum.Font.GothamBold,TextSize=b:GetFontSize(),TextColor3=r.
+text,Parent=ak})w.corner(aq,4)aq.MouseButton1Click:Connect(function()if ap.
+Callback then ap.Callback()end end)local ar={Type='Button',Inst=aq}table.insert(
+C.Items,ar)return ar end function am:Label(an)local ao=w.new('TextLabel',{Size=
+UDim2.new(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,TextWrapped=true,
+BackgroundTransparency=1,Text=an,Font=Enum.Font.Gotham,TextSize=b:GetFontSize(),
+TextColor3=r.textDim,TextXAlignment=Enum.TextXAlignment.Left,RichText=true,
+Parent=ak})table.insert(C.Items,{Type='Label',Inst=ao})return{Set=function(ap,aq
+)ao.Text=aq end}end function am:DualButton(an,ao,ap)local aq=w.new('Frame',{Size
+=UDim2.new(1,0,0,20),BackgroundTransparency=1,Parent=ak})local ar=w.new(
+'TextLabel',{Size=UDim2.new(1,-110,1,0),BackgroundTransparency=1,Text=an,Font=
+Enum.Font.Gotham,TextSize=b:GetFontSize(),TextColor3=r.text,TextXAlignment=Enum.
+TextXAlignment.Left,Parent=aq})local function mkBtn(as,at)local au=w.new(
+'TextButton',{Size=UDim2.new(0,50,0,18),Position=at,Text=as.Text or'Btn',Font=
+Enum.Font.GothamBold,TextSize=12,Parent=aq,AutoButtonColor=true})w.corner(au,4)
+if as.Color then au.BackgroundColor3=as.Color au.TextColor3=w.contrast(as.Color,
+Color3.new(1,1,1),Color3.new(0,0,0))else au.BackgroundColor3=r.element au.
+TextColor3=r.text end au.MouseButton1Click:Connect(function()if as.Callback then
+as.Callback()end end)return au end mkBtn(ao,UDim2.new(1,-105,0,1))mkBtn(ap,UDim2
+.new(1,-50,0,1))table.insert(C.Items,{Type='DualButton',Inst=aq})end function am
+:ActionRow(an,ao)local ap=w.new('Frame',{Size=UDim2.new(1,0,0,0),
+BackgroundTransparency=1,AutomaticSize=Enum.AutomaticSize.Y,Parent=ak})local aq=
+w.new('TextLabel',{Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,
+AutomaticSize=Enum.AutomaticSize.Y,Text=an,Font=Enum.Font.Gotham,TextSize=b:
+GetFontSize(),TextColor3=r.text,TextXAlignment=Enum.TextXAlignment.Left,
+TextWrapped=true,RichText=true,LayoutOrder=1,Parent=ap})local ar=w.new('Frame',{
+Size=UDim2.new(1,0,0,22),BackgroundTransparency=1,LayoutOrder=2,Parent=ap})w.
+list(ar,Enum.FillDirection.Horizontal,4)local function mkBtn(as)local at=w.new(
+'TextButton',{Size=UDim2.new(0,60,0,18),Text=as.Text or'Btn',Font=Enum.Font.
+GothamBold,TextSize=11,Parent=ar,AutoButtonColor=true})w.corner(at,4)if as.Color
+then at.BackgroundColor3=as.Color at.TextColor3=w.contrast(as.Color,Color3.new(1
+,1,1),Color3.new(0,0,0))else at.BackgroundColor3=r.element at.TextColor3=r.text
+end at.MouseButton1Click:Connect(function()if as.Callback then as.Callback()end
+end)return at end for as,at in ipairs(ao)do mkBtn(at)end w.list(ap,Enum.
+FillDirection.Vertical,2)table.insert(C.Items,{Type='ActionRow',Inst=ap})return{
+SetText=function(as,at)aq.Text=at end,Visible=function(as,at)ap.Visible=at end,
+SetLayoutOrder=function(as,at)ap.LayoutOrder=at end,Destroy=function(as)ap:
+Destroy()end,Inst=ap}end function am:MiniActionRow(an,ao)local ap=w.new('Frame',
+{Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,AutomaticSize=Enum.
+AutomaticSize.Y,Parent=ak})w.list(ap,Enum.FillDirection.Horizontal,4)local aq=w.
+new('TextLabel',{Size=UDim2.new(1,-50,0,0),BackgroundTransparency=1,
+AutomaticSize=Enum.AutomaticSize.Y,Text=an,Font=Enum.Font.Gotham,TextSize=b:
+GetFontSize('Small'),TextColor3=r.text,TextXAlignment=Enum.TextXAlignment.Left,
+TextWrapped=true,RichText=true,Parent=ap})local ar=w.new('Frame',{Size=UDim2.
+new(0,46,1,0),BackgroundTransparency=1,Parent=ap})local as=w.list(ar,Enum.
+FillDirection.Horizontal,4)as.HorizontalAlignment=Enum.HorizontalAlignment.Right
+local function mkBtn(at)local au=w.new('TextButton',{Size=UDim2.new(0,20,0,16),
+Text=at.Text or'?',Font=Enum.Font.GothamBold,TextSize=10,Parent=ar,
+AutoButtonColor=true})w.corner(au,2)if at.Color then au.BackgroundColor3=at.
+Color au.TextColor3=w.contrast(at.Color,Color3.new(1,1,1),Color3.new(0,0,0))else
+au.BackgroundColor3=r.element au.TextColor3=r.text end au.MouseButton1Click:
+Connect(function()if at.Callback then at.Callback()end end)return au end for at,
+au in ipairs(ao)do mkBtn(au)end table.insert(C.Items,{Type='ActionRow',Inst=ap})
+return{SetText=function(at,au)aq.Text=au end,Visible=function(at,au)ap.Visible=
+au end,SetLayoutOrder=function(at,au)ap.LayoutOrder=au end,Destroy=function(at)
+ap:Destroy()end,Inst=ap}end function am:Slider(an,ao,ap,aq,ar,as)local at=(type(
+an)=='table')and an or{Name=an,Range={ao,ap},CurrentValue=aq,Callback=as or ar}
+local au,av=at.Range[1],at.Range[2]local aw=at.CurrentValue or au local ax=w.
+new('Frame',{Size=UDim2.new(1,0,0,30),BackgroundTransparency=1,Parent=ak})local
+ay=w.new('TextLabel',{Size=UDim2.new(1,0,0,12),BackgroundTransparency=1,Text=at.
+Name,Font=Enum.Font.Gotham,TextSize=b:GetFontSize(),TextXAlignment=Enum.
+TextXAlignment.Left,Parent=ax})local az=w.new('Frame',{Size=UDim2.new(1,0,0,12),
+Position=UDim2.new(0,0,0,14),Parent=ax})w.corner(az,2)local aA=w.new('Frame',{
+Size=UDim2.new((aw-au)/(av-au),0,1,0),Parent=az})w.corner(aA,2)local aB=w.new(
+'TextLabel',{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text=string.
+format('%.1f',aw),Font=Enum.Font.GothamBold,TextSize=b:GetFontSize('Small'),
+TextColor3=Color3.new(1,1,1),Parent=az})local aC=w.new('TextButton',{Size=UDim2.
+new(1,0,1,0),BackgroundTransparency=1,Text='',Parent=az})table.insert(C.Items,{
+Type='Slider',Label=ay,Bar=az,Fill=aA})local function set(aD)aw=math.clamp(aD,au
+,av)aA.Size=UDim2.new((aw-au)/(av-au),0,1,0)aB.Text=string.format('%.1f',aw)if
+at.Callback then at.Callback(aw)end end local aD=false local aE=nil
+local function update(aF)local aG=aF.Position local aH=math.clamp((aG.X-az.
+AbsolutePosition.X)/az.AbsoluteSize.X,0,1)set(au+(av-au)*aH)end aC.InputBegan:
+Connect(function(aF)if aF.UserInputType==Enum.UserInputType.MouseButton1 or aF.
+UserInputType==Enum.UserInputType.Touch then aD=true aE=aF update(aF)end end)e.
+InputChanged:Connect(function(aF)if aD then if aF==aE then update(aF)elseif aF.
+UserInputType==Enum.UserInputType.MouseMovement and aE.UserInputType==Enum.
+UserInputType.MouseButton1 then update(aF)end end end)e.InputEnded:Connect(
+function(aF)if aF==aE then aD=false aE=nil end end)return{Set=function(aF,aG)
+set(aG)end}end function am:Dropdown(an,ao,ap,aq)local ar=(type(an)=='table')and
+an or{Name=an,Options=ao,CurrentOption=ap,Callback=aq}local as=ar.Options or{}
+local at=ar.MultiSelect or false local au=ar.CurrentOption or(at and{}or(as[1]
+and(type(as[1])=='table'and as[1].Value or as[1])))if at and type(au)~='table'
+then au={}end local function getLV(av)if type(av)=='table'and av.Label and av.
+Value then return av.Label,av.Value end return tostring(av),av end
+local function getBtnText()if at then if#au==0 then return'None'end if#au==#as
+then return'All'end local av={}for aw,ax in ipairs(au)do local ay=tostring(ax)
+for az,aA in ipairs(as)do local aB,aC=getLV(aA)if aC==ax then ay=aB break end
+end table.insert(av,ay)end return table.concat(av,', ')else for av,aw in ipairs(
+as)do local ax,ay=getLV(aw)if ay==au then return ax end end return tostring(au)
+end end local av=w.new('Frame',{Size=UDim2.new(1,0,0,38),BackgroundTransparency=
+1,Parent=ak})local aw=w.new('TextLabel',{Size=UDim2.new(1,0,0,14),Position=UDim2
+.new(0,0,0,0),BackgroundTransparency=1,Text=ar.Name,Font=Enum.Font.Gotham,
+TextSize=b:GetFontSize('Small'),TextColor3=r.textDim,TextXAlignment=Enum.
+TextXAlignment.Left,Parent=av})local ax=w.new('TextButton',{Size=UDim2.new(1,0,0
+,20),Position=UDim2.new(0,0,0,18),Text=getBtnText(),Font=Enum.Font.Gotham,
+TextSize=b:GetFontSize('Small'),TextTruncate=Enum.TextTruncate.AtEnd,Parent=av})
+w.corner(ax,4)local ay=w.new('Frame',{Size=UDim2.new(0,200,0,0),Position=UDim2.
+new(0,0,0,0),Visible=false,BackgroundColor3=r.panel,ZIndex=1005,Parent=E})w.
+corner(ay,4)w.stroke(ay)local az=w.new('ScrollingFrame',{Size=UDim2.new(1,0,1,0)
+,BackgroundTransparency=1,CanvasSize=UDim2.new(0,0,0,0),ScrollBarThickness=2,
+Parent=ay})local aA=w.list(az,Enum.FillDirection.Vertical,0)aA:
+GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()az.CanvasSize=
+UDim2.new(0,0,0,aA.AbsoluteContentSize.Y)end)local function render()for aB,aC in
+pairs(az:GetChildren())do if aC:IsA('TextButton')then aC:Destroy()end end for aB
+,aC in ipairs(as)do local aD,aE=getLV(aC)local aF=false if at then for aG,aH in
+ipairs(au)do if aH==aE then aF=true break end end else aF=(au==aE)end local aG=w
+.new('TextButton',{Size=UDim2.new(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundTransparency=aF and 0.8 or 1,BackgroundColor3=r.accent,Text=aD,
+TextWrapped=true,TextXAlignment=Enum.TextXAlignment.Left,TextYAlignment=Enum.
+TextYAlignment.Center,Font=aF and Enum.Font.GothamBold or Enum.Font.Gotham,
+TextSize=b:GetFontSize('Small'),TextColor3=w.contrast(r.panel,Color3.new(1,1,1),
+Color3.new(0,0,0)),Parent=az})w.new('UIPadding',{PaddingTop=UDim.new(0,4),
+PaddingBottom=UDim.new(0,4),PaddingLeft=UDim.new(0,6),PaddingRight=UDim.new(0,6)
+,Parent=aG})aG.MouseButton1Click:Connect(function()if at then local aH=table.
+find(au,aE)if aH then table.remove(au,aH)else table.insert(au,aE)end local aI=
+not aH aG.BackgroundTransparency=aI and 0.8 or 1 aG.Font=aI and Enum.Font.
+GothamBold or Enum.Font.Gotham else au=aE ay.Visible=false render()end ax.Text=
+getBtnText()if ar.Callback then ar.Callback(au)end end)table.insert(C.Items,{
+Type='DropdownOpt',Inst=aG})end end render()local aB=nil ax.MouseButton1Click:
+Connect(function()ay.Visible=not ay.Visible if ay.Visible then local aC=ax.
+AbsolutePosition local aD=ax.AbsoluteSize ay.Position=UDim2.new(0,aC.X,0,aC.Y+aD
+.Y+2)local aE=az.CanvasSize.Y.Offset ay.Size=UDim2.new(0,aD.X,0,math.min(200,
+math.max(30,aE)))if aB then aB:Disconnect()end aB=f.RenderStepped:Connect(
+function()if not ay.Visible or not ax.Parent then if aB then aB:Disconnect()end
+return end local aF=ax.AbsolutePosition ay.Position=UDim2.new(0,aF.X,0,aF.Y+aD.Y
++2)end)else if aB then aB:Disconnect()end end end)table.insert(C.Items,{Type=
+'Dropdown',Btn=ax,Drop=ay,Label=aw,Opts={}})return{Set=function(aC,aD)au=aD ax.
+Text=getBtnText()render()end,Get=function(aC)return au end,Refresh=function(aC,
+aD,aE)as=aD if aE then au=aE end ax.Text=getBtnText()render()if ay.Visible then
+local aF=az.CanvasSize.Y.Offset ay.Size=UDim2.new(0,ax.AbsoluteSize.X,0,math.
+min(200,math.max(30,aF)))end end}end function am:ItemRow(an,ao,ap,aq)local ar=w.
+new('Frame',{Size=UDim2.new(1,0,0,16),BackgroundTransparency=1,Parent=ak})local
+as=w.new('TextLabel',{Size=UDim2.new(1,-56,1,0),BackgroundTransparency=1,Text=an
+..(ao.count and' ('..ao.count..')'or''),Font=Enum.Font.Gotham,TextSize=b:
+GetFontSize(),TextXAlignment=Enum.TextXAlignment.Left,Parent=ar})local at=w.new(
+'TextButton',{Size=UDim2.new(0,24,0,12),Position=UDim2.new(1,-54,0.5,-6),Text=
+'Get',Font=Enum.Font.GothamBold,TextSize=b:GetFontSize('Small'),TextColor3=w.
+contrast(r.element,Color3.new(1,1,1),Color3.new(0,0,0)),Parent=ar})w.corner(at,2
+)local au=w.new('TextButton',{Size=UDim2.new(0,26,0,12),Position=UDim2.new(1,-26
+,0.5,-6),Text='Auto',Font=Enum.Font.GothamBold,TextSize=b:GetFontSize('Small'),
+Parent=ar})w.corner(au,2)local av=false at.MouseButton1Click:Connect(function()
+if ap then ap(an,ao)end end)au.MouseButton1Click:Connect(function()av=not av C:
+Update()if aq then aq(an,av,ao)end end)table.insert(C.Items,{Type='Button',Inst=
+at})table.insert(C.Items,{Type='Label',Inst=as})table.insert(C.Items,{Type=
+'AutoButton',Inst=au,GetVal=function()return av end})return{UpdateCount=function
+(aw)as.Text=an..' ('..aw..')'end,SetFarming=function(aw)av=aw end}end function
+am:CreateParagraph(an)return am:Label(an.Title..': '..an.Content)end function am
+:TextBox(an,ao,ap,aq)local ar=(type(an)=='table')and an or{Name=an,
+PlaceholderText=ao,CurrentValue=ap,Callback=aq}local as=ar.CurrentValue or''
+local at=w.new('Frame',{Size=UDim2.new(1,0,0,32),BackgroundTransparency=1,Parent
+=ak})local au=w.new('TextLabel',{Size=UDim2.new(1,0,0,12),BackgroundTransparency
+=1,Text=ar.Name,Font=Enum.Font.Gotham,TextSize=b:GetFontSize('Small'),TextColor3
+=r.textDim,TextXAlignment=Enum.TextXAlignment.Left,Parent=at})local av=w.new(
+'Frame',{Size=UDim2.new(1,0,0,18),Position=UDim2.new(0,0,0,14),BackgroundColor3=
+r.element,Parent=at})w.corner(av,4)local aw=w.new('TextBox',{Size=UDim2.new(1,-8
+,1,0),Position=UDim2.new(0,4,0,0),BackgroundTransparency=1,Text=as,
+PlaceholderText=ar.PlaceholderText or'',Font=Enum.Font.Gotham,TextSize=b:
+GetFontSize(),TextColor3=r.text,PlaceholderColor3=r.textDim,TextXAlignment=Enum.
+TextXAlignment.Left,ClearTextOnFocus=false,Parent=av})aw.FocusLost:Connect(
+function(ax)as=aw.Text if ar.Callback then ar.Callback(as,ax)end end)table.
+insert(C.Items,{Type='TextBox',Inst=at,Box=aw})return{Set=function(ax,ay)as=ay
+aw.Text=ay end,Get=function(ax)return as end}end function am:TimerItem(an,ao,ap)
+local aq=w.new('Frame',{Size=UDim2.new(1,0,0,24),BackgroundTransparency=1,Parent
+=ak})local ar=w.new('TextLabel',{Size=UDim2.new(0.5,-4,1,0),Position=UDim2.new(0
+,0,0,0),BackgroundTransparency=1,Text=an or'Item',Font=Enum.Font.Gotham,TextSize
+=b:GetFontSize('Small'),TextColor3=r.text,TextXAlignment=Enum.TextXAlignment.
+Left,TextTruncate=Enum.TextTruncate.AtEnd,Parent=aq})local as=w.new('TextLabel',
+{Size=UDim2.new(0.3,0,1,0),Position=UDim2.new(0.5,0,0,0),BackgroundTransparency=
+1,Text='--',Font=Enum.Font.GothamBold,TextSize=b:GetFontSize('Small'),TextColor3
+=r.warning,TextXAlignment=Enum.TextXAlignment.Center,Parent=aq})local at=w.new(
+'TextButton',{Size=UDim2.new(0,40,0,18),Position=UDim2.new(1,-40,0.5,-9),Text=
+'CLR',Font=Enum.Font.GothamBold,TextSize=10,BackgroundColor3=r.error,TextColor3=
+r.text,Parent=aq})w.corner(at,4)local au=true local av={Type='TimerItem',Inst=aq
+}table.insert(C.Items,av)local function destroy()if not au then return end au=
+false aq:Destroy()end at.MouseButton1Click:Connect(function()if ap then ap()end
+destroy()end)task.spawn(function()while au and aq.Parent do local aw=ao-tick()if
+aw<=0 then as.Text='0s'else as.Text=string.format('%.0fs',aw)end task.wait(0.5)
+end end)return{Destroy=destroy,UpdateExpiry=function(aw,ax)ao=ax end}end C:
+Update()return am end function ag:Column()return ag end function ag:
+CreateSection(ah)return ag:Panel(ah)end function ag:CreateToggle(ah)return ag:
+Panel('General'):Toggle(ah)end return ag end local aa=C:CreateTab('Settings')aa.
+Btn.Visible=false aa.Btn.Parent=nil local ab=aa:Panel('Theme')C.ThemeButtons[ab:
+Button('Matrix',function()b:Save('theme','Matrix')end).Inst]='Matrix'C.
+ThemeButtons[ab:Button('Dark',function()b:Save('theme','Dark')end).Inst]='Dark'C
+.ThemeButtons[ab:Button('Ocean',function()b:Save('theme','Ocean')end).Inst]=
+'Ocean'C.ThemeButtons[ab:Button('Custom',function()b:Save('theme','Custom')end).
+Inst]='Custom'local ac=aa:Panel('Custom Settings')local function parseColor(ad)
+local ae,af,ag=ad:match('(%d+),%s*(%d+),%s*(%d+)')if ae and af and ag then
+return Color3.fromRGB(tonumber(ae),tonumber(af),tonumber(ag))end return nil end
+local function colorStr(ad)if not ad then return'0, 0, 0'end if typeof(ad)==
+'Color3'then return string.format('%d, %d, %d',ad.R*255,ad.G*255,ad.B*255)elseif
+type(ad)=='table'and ad.r then return string.format('%d, %d, %d',ad.r*255,ad.g*
+255,ad.b*255)end return'0, 0, 0'end local ad=q.Custom local function
+updateCustom(ae,af)ad[ae]=af b:Save('CustomTheme',ad)end ac:TextBox('Background'
+,'R, G, B',colorStr(ad.bg),function(ae)local af=parseColor(ae)if af then
+updateCustom('bg',af)end end)ac:TextBox('Panel','R, G, B',colorStr(ad.panel),
+function(ae)local af=parseColor(ae)if af then updateCustom('panel',af)end end)ac
+:TextBox('Accent','R, G, B',colorStr(ad.accent),function(ae)local af=parseColor(
+ae)if af then updateCustom('accent',af)end end)ac:TextBox('Text','R, G, B',
+colorStr(ad.text),function(ae)local af=parseColor(ae)if af then updateCustom(
+'text',af)end end)ac:Slider('Rounding',0,12,ad.rounding or 4,function(ae)
+updateCustom('rounding',ae)end)local ae=aa:Panel('Layout')C.LayoutButtons[ae:
+Button('Horizontal Tabs',function()b:Save('layout','Horizontal')end).Inst]=
+'Horizontal'C.LayoutButtons[ae:Button('Vertical Tabs',function()b:Save('layout',
+'Vertical')end).Inst]='Vertical'local af=aa:Panel('Font')af:Slider('Size',10,20,
+b.Settings.FontSize or 14,function(ag)b:Save('FontSize',ag)end)local ag=aa:
+Panel('Logging')ag:Slider('Max Lines',100,5000,b.Settings.MaxLogHistory or 1000,
+function(ah)b:Save('MaxLogHistory',math.floor(ah))end)R.MouseButton1Click:
+Connect(function()if C.ActiveTab==aa then if C.LastActiveTab then C:SetActive(C.
+LastActiveTab)end else C:SetActive(aa)end end)function C:ToggleLog()if C.
+LogWindowInstance then C.LogWindowInstance.Visible=not C.LogWindowInstance.
+Visible return end local ah='PrismLog_'..C.Name:gsub('%s','_')local ai=g:
+FindFirstChild(ah)or i:WaitForChild('PlayerGui'):FindFirstChild(ah)if not ai
+then ai=w.new('ScreenGui',{Name=ah,ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
+if gethui then ai.Parent=gethui()elseif syn and syn.protect_gui then syn.
+protect_gui(ai)ai.Parent=g else ai.Parent=g end if not ai.Parent then ai.Parent=
+i:WaitForChild('PlayerGui')end end local aj=w.new('Frame',{Size=UDim2.new(0,500,
+0,300),Position=UDim2.new(0.5,-250,0.5,-150),BackgroundColor3=r.bg,Parent=ai})w.
+corner(aj,r.rounding)w.stroke(aj,r.border)w.drag(aj,aj)local ak=w.new('Frame',{
+Size=UDim2.new(1,0,0,30),BackgroundColor3=r.panel,Parent=aj})w.corner(ak,r.
+rounding)local al=w.new('TextLabel',{Size=UDim2.new(1,-60,1,0),Position=UDim2.
+new(0,10,0,0),BackgroundTransparency=1,Text=C.Name..' Logs',Font=Enum.Font.
+GothamBold,TextSize=14,TextColor3=r.text,TextXAlignment=Enum.TextXAlignment.Left
+,Parent=ak})local am=w.new('TextButton',{Size=UDim2.new(0,24,0,24),Position=
+UDim2.new(1,-26,0.5,-12),BackgroundTransparency=1,Text='\u{d7}',Font=Enum.Font.
+GothamBold,TextSize=16,TextColor3=r.accent,Parent=ak})am.MouseButton1Click:
+Connect(function()aj.Visible=false end)local an=w.new('TextButton',{Size=UDim2.
+new(0,24,0,24),Position=UDim2.new(1,-54,0.5,-12),BackgroundTransparency=1,Text=
+'\u{1f4cb}',Font=Enum.Font.GothamBold,TextSize=14,TextColor3=r.textDim,Parent=ak
+})an.MouseButton1Click:Connect(function()local ao={}for ap,aq in ipairs(C.
+LogHistory)do table.insert(ao,string.format('[%s] [%s] %s',aq.Time,aq.Type,aq.
+Message))end local ap=table.concat(ao,'\n')if setclipboard then setclipboard(ap)
+b:Notify({Title='Success',Content='Logs copied to clipboard!',Type='Success'})
+else b:Notify({Title='Error',Content='Clipboard not supported.',Type='Error'})
+end end)local ao=w.new('ScrollingFrame',{Size=UDim2.new(1,-10,1,-40),Position=
+UDim2.new(0,5,0,35),BackgroundTransparency=1,CanvasSize=UDim2.new(0,0,0,0),
+ScrollBarThickness=4,Parent=aj})local ap=w.list(ao,Enum.FillDirection.Vertical,2
+)ap:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()ao.
+CanvasSize=UDim2.new(0,0,0,ap.AbsoluteContentSize.Y+20)end)local function
+refresh()if not aj.Visible then return end for aq,ar in pairs(ao:GetChildren())
+do if ar:IsA('Frame')then ar:Destroy()end end for aq,ar in ipairs(C.LogHistory)
+do local as=w.new('Frame',{Size=UDim2.new(1,0,0,0),AutomaticSize=Enum.
+AutomaticSize.Y,BackgroundTransparency=1,Parent=ao})local at=w.new('TextLabel',{
+Size=UDim2.new(0,60,0,16),BackgroundTransparency=1,Text=ar.Time,Font=Enum.Font.
+Code,TextSize=12,TextColor3=r.textDim,TextXAlignment=Enum.TextXAlignment.Left,
+Parent=as})local au=w.new('TextLabel',{Size=UDim2.new(1,-65,0,16),Position=UDim2
+.new(0,65,0,0),BackgroundTransparency=1,Text=ar.Message,Font=Enum.Font.Code,
+TextSize=12,TextColor3=(ar.Type=='Error'and r.error)or(ar.Type=='Warning'and r.
+warning)or r.text,TextXAlignment=Enum.TextXAlignment.Left,TextWrapped=true,
+AutomaticSize=Enum.AutomaticSize.Y,Parent=as})as.Size=UDim2.new(1,0,0,au.
+AbsoluteSize.Y)end ao.CanvasPosition=Vector2.new(0,99999)end C.LogWindowInstance
+=aj C.UpdateLog=function()C.LogDirty=true end task.spawn(function()while aj.
+Parent do if C.LogDirty then C.LogDirty=false refresh()end task.wait(0.2)end end
+)refresh()end S.MouseButton1Click:Connect(function()C:ToggleLog()end)table.
+insert(b.Windows,C)C:Update()return C end function b:LoadConfiguration()end
+function b:Notify(aa)aa=aa or{}local ab=aa.Title or'Notification'local ac=aa.
+Content or''local ad=aa.Duration or 3 local ae=aa.Type or'Info'local af=aa.
+Urgent or false local ag=g:FindFirstChild('PrismNotifications')or i:
+WaitForChild('PlayerGui'):FindFirstChild('PrismNotifications')if not ag then ag=
+w.new('ScreenGui',{Name='PrismNotifications',ZIndexBehavior=Enum.ZIndexBehavior.
+Sibling})pcall(function()ag.Parent=g end)if not ag.Parent then ag.Parent=i:
+WaitForChild('PlayerGui')end end local ah=ag:FindFirstChild('Container')if not
+ah then ah=w.new('Frame',{Name='Container',Size=UDim2.new(0,250,1,0),Position=
+UDim2.new(1,-260,0,0),BackgroundTransparency=1,Parent=ag})w.pad(ah,10)w.list(ah,
+Enum.FillDirection.Vertical,5)local ai=ah:FindFirstChild('UIListLayout')ai.
+VerticalAlignment=Enum.VerticalAlignment.Bottom end local ai={Success=Color3.
+fromRGB(0,220,80),Warning=Color3.fromRGB(220,180,20),Error=Color3.fromRGB(220,60
+,60),Info=Color3.fromRGB(40,160,240)}local aj=ai[ae]or ai.Info local ak=w.new(
+'Frame',{Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,AutomaticSize=Enum.
+AutomaticSize.Y,Parent=ah})local al=af and Color3.fromRGB(40,20,20)or Color3.
+fromRGB(20,20,20)local am=af and aj or Color3.fromRGB(40,40,40)local an=w.new(
+'Frame',{Size=UDim2.new(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundColor3=al,Parent=ak})w.corner(an,4)w.stroke(an,am,af and 2 or 1)local
+ao=w.new('Frame',{Size=UDim2.new(0,af and 6 or 4,1,0),BackgroundColor3=aj,Parent
+=an})w.new('UICorner',{CornerRadius=UDim.new(0,2),Parent=ao})local ap=af and 14
+or 12 local aq=af and 12 or 11 local ar=w.new('TextLabel',{Size=UDim2.new(1,-16,
+0,af and 20 or 16),Position=UDim2.new(0,10,0,4),BackgroundTransparency=1,Text=af
+and'\u{26a0} '..ab or ab,Font=Enum.Font.GothamBold,TextSize=ap,TextColor3=af and
+aj or Color3.fromRGB(240,240,240),TextXAlignment=Enum.TextXAlignment.Left,Parent
+=an})local as=w.new('TextLabel',{Size=UDim2.new(1,-16,0,0),Position=UDim2.new(0,
+10,0,af and 26 or 20),BackgroundTransparency=1,Text=ac,Font=Enum.Font.Gotham,
+TextSize=aq,TextColor3=Color3.fromRGB(180,180,180),TextXAlignment=Enum.
+TextXAlignment.Left,TextWrapped=true,AutomaticSize=Enum.AutomaticSize.Y,Parent=
+an})w.pad(an,4)ak.BackgroundTransparency=1 an.Position=UDim2.new(1,50,0,0)local
+at=game:GetService('TweenService')local au=TweenInfo.new(0.3,Enum.EasingStyle.
+Quart,Enum.EasingDirection.Out)at:Create(an,au,{Position=UDim2.new(0,0,0,0)}):
+Play()task.delay(ad,function()if not an.Parent then return end at:Create(an,au,{
+Position=UDim2.new(1,50,0,0),BackgroundTransparency=1}):Play()task.wait(0.3)ak:
+Destroy()end)return ak end return b end local function
+__BUNDLED_OptionsManager__()local a=game:GetService('HttpService')local aa={}aa.
+__index=aa local function safeRead(ab)if not isfile or not isfile(ab)then return
+nil end local ac,ad=pcall(readfile,ab)if ac then return ad end return nil end
+local function safeWrite(ab,ac)if not writefile then return end if not isfolder(
+'Configs')then makefolder('Configs')end pcall(writefile,ab,ac)end local function
+deepEqual(ab,ac)if type(ab)~=type(ac)then return false end if type(ab)~='table'
+then return ab==ac end if#ab~=#ac then return false end for ad,ae in pairs(ab)do
+if not deepEqual(ae,ac[ad])then return false end end for ad in pairs(ac)do if ab
+[ad]==nil then return false end end return true end local function shallowCopy(
+ab)local ac={}for ad,ae in pairs(ab)do ac[ad]=ae end return ac end function aa.
+new(ab,ac)local ad=setmetatable({},aa)ad.Name=ab ad.Prism=ac ad.Definitions={}ad
+.KeyOrder={}ad.Values={}ad.ConfigPath='Configs/'..ab..'.json'return ad end
+function aa:Define(ab,ac)if not self.Definitions[ab]then table.insert(self.
+KeyOrder,ab)end self.Definitions[ab]=ac if self.Values[ab]==nil and ac.Default~=
+nil then self.Values[ab]=ac.Default end end function aa:Set(ab,ac,ad,ae)local af
+=self.Definitions[ab]if not af then return end if deepEqual(self.Values[ab],ac)
+then return end if type(ac)=='table'then self.Values[ab]=shallowCopy(ac)else
+self.Values[ab]=ac end if af.Callback then task.spawn(function()af.Callback(ac)
+end)end if not ae and self.UIElements and self.UIElements[ab]then local ag=self.
+UIElements[ab]if ag.Set then ag:Set(ac)end end if not ad then self:Save()end end
+function aa:Get(ab)return self.Values[ab]end function aa:Load()local ab=
+safeRead(self.ConfigPath)if ab then local ac,ad=pcall(a.JSONDecode,a,ab)if ac
+and type(ad)=='table'then for ae,af in pairs(ad)do if self.Definitions[ae]then
+self.Values[ae]=af end end end end for ac,ad in pairs(self.Definitions)do local
+ae=self.Values[ac]if ae==nil then ae=ad.Default self.Values[ac]=ae end if ad.
+Callback and ae~=ad.Default then task.spawn(function()ad.Callback(ae)end)end end
+end function aa:Save()local ab={}for ac,ad in pairs(self.Values)do local ae=self
+.Definitions[ac]if ae and not ae.DontPersist then ab[ac]=ad end end local ac=a:
+JSONEncode(ab)safeWrite(self.ConfigPath,ac)end function aa:Cleanup()for ab,ac in
+pairs(self.Definitions)do if ac.Cleanup then task.spawn(function()ac.Cleanup(
+self.Values[ab])end)end end end function aa:BindToClose(ab)if ab and ab.OnClose
+then ab:OnClose(function()self:Cleanup()end)end end function aa:Reset(ab)for ac,
+ad in pairs(self.Definitions)do if not ab or ad.Category==ab then self:Set(ac,ad
+.Default,true)end end self:Save()end function aa:Render(ab,ac)local ad=ab if ab.
+Panel then ad=ab:Panel(self.Name..' Settings')end local ae=self.KeyOrder if not
+self.UIElements then self.UIElements={}end for af,ag in ipairs(ae)do local ah=
+self.Definitions[ag]if not ac or ah.Category==ac then local ai=self.Values[ag]if
+ai==nil then ai=ah.Default end if type(ai)=='table'then ai=shallowCopy(ai)end if
+ah.Type=='Toggle'then local aj=ad:Toggle(ah.Name,ai,function(aj)self:Set(ag,aj,
+false,true)end)self.UIElements[ag]=aj elseif ah.Type=='Slider'then local aj=(ah.
+Range and ah.Range[1])or ah.Min or 0 local ak=(ah.Range and ah.Range[2])or ah.
+Max or 100 local al=ad:Slider(ah.Name,aj,ak,ai,function(al)self:Set(ag,al,false,
+true)end)self.UIElements[ag]=al elseif ah.Type=='Dropdown'then local aj=ad:
+Dropdown({Name=ah.Name,Options=ah.Options,CurrentOption=ai,MultiSelect=ah.
+MultiSelect,Callback=function(aj)self:Set(ag,aj,false,true)end})self.UIElements[
+ag]=aj elseif ah.Type=='TextBox'then local aj=ad:TextBox(ah.Name,ah.Placeholder
+or'Enter text...',ai,function(aj)self:Set(ag,aj,false,true)end)self.UIElements[
+ag]=aj end if ah.Description then ad:Label(ah.Description)end end end ad:Button(
+'Reset to Defaults',function()self:Reset(ac)for af,ag in pairs(self.UIElements)
+do local ah=self.Definitions[af]if not ac or(ah and ah.Category==ac)then local
+ai=self.Values[af]if ag.Set then ag.Set(ag,ai)end end end if self.Prism then
+self.Prism:Notify({Title='Reset',Content='Settings have been reset.'})end end)
+end return aa end local a=__BUNDLED_PrismUI__()a:HookLogs()local aa=game:
+GetService('CoreGui')local ab=game:GetService('Players')local ac=game:
+GetService('ProximityPromptService')local ad=game:GetService('RunService')local
+ae=game:GetService('UserInputService')local af=game:GetService('Workspace')local
+ag=af.CurrentCamera local ah=ab.LocalPlayer local ai=__BUNDLED_OptionsManager__(
+)local aj=ai.new('Humankind3_Autofarm_v25',a)local ak={'Wood','Big Wood','Iron',
+'Coal','Stone','Clay','Copper','Tin','Sand','Sulfur'}local al={}local am={
+MiningDistance=4,TimeoutSeconds=20,TeleportDelay=0,BlacklistDuration=3600,
+ScanInterval=0.5,Debug=false,AutoMine=true,MineInterval=0.5,TeleportMode=
+'Underground',ReturnWhenIdle=true,FarmWithoutFarmer=false,AutoFarmCrops=false,
+AutoEat=false,AutoHeal=false,AutoEatMax=1,AutoHealMax=4,AutoWater=false,
+AutoPlant=false,PriorityThreshold=25,AutoStorageTakeEnabled=false,
+AutoStorageTransferEnabled=false,AutoStorageInterval=5,AutoStorageHouseId='',
+AutoStorageTP=false,StorageActionInProgress=false,MarketRemote=nil,
+ShopsAutostockEnabled=false,ShopsScanEnabled=true}local an={Pizza=50,['Meat Pie'
+]=30,['Berry Pie']=30,Burrito=25,Taco=20,Baguette=25,Chili=25,["Shepherd's Pie"]
+=20,Noodles=20,Cheese=20,Bread=17,['Buche de Noel']=17,['Rice Cake']=17,[
+'Beef Tamal']=17,['Meat Stew']=16,['Cooked Meat']=12,['Mash Potatoes']=15,[
+'Flat Bread']=12,Tortilla=12,['Corn Tamal']=12,Tofu=12,['Onion Soup']=12,[
+'Tomato Soup']=12,['Vegetable Stew']=12,['Cranberry Sauce']=12}local ao={[
+'Medicinal Herb']=10}local ap={Wheat={Name='Wheat',Time=4,Level=3,Ethnicity={
+'Europe','Africa','India','Oceania','Middle East','China','North America',
+'South America'}},Carrot={Name='Carrot',Time=2,Level=0,Ethnicity={'Europe',
+'Africa','Oceania'}},Cabbage={Name='Cabbage',Time=6,Level=5,Ethnicity={'Europe'}
+},Berry={Name='Berry',Time=2,Level=0,Ethnicity={'North America'}},Corn={Name=
+'Corn',Time=4,Level=3,Ethnicity={'North America','South America'}},Pumpkin={Name
+='Pumpkin',Time=8,Level=5,Ethnicity={'North America'}},Tomato={Name='Tomato',
+Time=2,Level=0,Ethnicity={'South America'}},Potato={Name='Potato',Time=6,Level=5
+,Ethnicity={'South America','Africa'}},Coffee={Name='Coffee',Time=2,Level=0,
+Ethnicity={'Africa'}},Watermelon={Name='Watermelon',Time=8,Level=5,Ethnicity={
+'Africa'}},['Soy Beans']={Name='Soy Beans',Time=2,Level=0,Ethnicity={'China'}},
+Rice={Name='Rice',Time=4,Level=3,Ethnicity={'China','Oceania'}},['Bok Choy']={
+Name='Bok Choy',Time=6,Level=5,Ethnicity={'China'}},Beet={Name='Beet',Time=2,
+Level=0,Ethnicity={'Middle East'}},Onion={Name='Onion',Time=4,Level=5,Ethnicity=
+{'Middle East'}},Cucumber={Name='Cucumber',Time=2,Level=0,Ethnicity={'India'}},
+Eggplant={Name='Eggplant',Time=4,Level=5,Ethnicity={'India'}},['Tea Leaf']={Name
+='Tea Leaf',Time=4,Level=15,Ethnicity={'India'}},Banana={Name='Banana',Time=8,
+Level=6,Ethnicity={'Oceania'}},['Heal Root']={Name='Heal Root',Time=5,Level=6,
+Ethnicity={'Europe','Africa','China','North America','South America','India',
+'Oceania','Middle East'}},Cotton={Name='Cotton',Time=6,Level=10,Ethnicity={
+'Europe','Africa','China','North America','South America','India','Oceania',
+'Middle East'}},Sage={Name='Sage',Time=5,Level=15,Ethnicity={'Europe','Africa',
+'China','North America','South America','India','Oceania','Middle East'}}}local
+aq=false local ar=nil local as=nil local at={'Europe','Africa','China',
+'North America','South America','India','Oceania','Middle East'}local au={Europe
+='Carrot',Africa='Coffee',China='Soy Beans',['North America']='Berry',[
+'South America']='Tomato',India='Cucumber',Oceania='Carrot',['Middle East']=
+'Beet'}local av={'Artisan','Barn','Cemetary','Dock','Farm','Forge','Garden',
+'Hospital','House','Military Camp','Mott','Restaurant','School','Stable',
+'Tailor Shop','Temple','Trading Post','Training Ground','Windmill'}local aw={
+'Forge','Artisan','Restaurant','Restuarant','Tailor Shop','Trading Post'}local
+ax={}local ay={}local az=false local aA=false local aB=nil local aC=nil local aD
+=true local aE=false local aF=false local aG=1000 local aH={}local aI=nil local
+b=nil local c=0 local d=setmetatable({},{__mode='k'})local e={}local f=0 local g
+={}local function getMarketRemote()if not am.MarketRemote then local h=game:
+GetService('ReplicatedStorage'):FindFirstChild('Remotes')if h then am.
+MarketRemote=h:FindFirstChild('Market')end end return am.MarketRemote end local
+h=setmetatable({},{__mode='k'})local i=setmetatable({},{__mode='k'})local j={}
+local k=setmetatable({},{__mode='k'})local l=setmetatable({},{__mode='k'})local
+m=false local n={}local o={}local p={}local q=false local r={}local s=nil local
+t=false local u={}local v={}local w=1000 local x=0.3 local y=true local z=true
+local A=true local B=false local C=false local D=5000 local E=5 local F={}local
+G=false local H=10 for I,J in ipairs(ak)do n[J]=1 p[J]=0 end local I={Wood=
+'Wood',['Big Wood']='Wood',Iron='Iron',Coal='Coal',Stone='Rock',Clay='Clay',
+Copper='Copper',Tin='Tin',Sand='Sand',Sulfur='Sulfur'}local J={Wood=Color3.
+fromRGB(34,139,34),['Big Wood']=Color3.fromRGB(34,139,34),Iron=Color3.fromRGB(
+192,192,192),Copper=Color3.fromRGB(192,192,192),Tin=Color3.fromRGB(192,192,192),
+Coal=Color3.fromRGB(105,105,105),Sulfur=Color3.fromRGB(105,105,105),Stone=Color3
+.fromRGB(210,180,140),Clay=Color3.fromRGB(210,180,140),Sand=Color3.fromRGB(210,
+180,140),Water=Color3.fromRGB(0,150,255),Plant=Color3.fromRGB(144,238,144)}local
+K={Enemy=Color3.fromRGB(255,60,60),Friendly=Color3.fromRGB(60,255,60),Neutral=
+Color3.fromRGB(200,200,200),EnemyKing=Color3.fromRGB(200,30,30),FriendlyKing=
+Color3.fromRGB(255,215,0)}local L={}local M=Instance.new('Part')M.Size=Vector3.
+new(1,1,1)M.Color=Color3.fromRGB(255,0,0)M.Material=Enum.Material.Neon M.Shape=
+Enum.PartType.Ball M.Anchored=true M.CanCollide=false M.CanTouch=false M.
+CanQuery=false M.Transparency=0.4 M.Name='AF_TargetBall'local function debugLog(
+N)if am.Debug then warn('[AF-v25]: '..tostring(N))end end local function
+isValidInstance(N)if N==nil then return false end if typeof(N)~='Instance'then
+return false end local O=N.Parent return O~=nil end local function safeCall(N,O)
+local P,Q=pcall(O)if not P then warn('[AF-v25 ERROR] '..N..': '..tostring(Q))end
+return P end local function triggerProximityPrompt(N)if not N or not N:IsA(
+'ProximityPrompt')then return false end if fireproximityprompt then local O=
+pcall(function()fireproximityprompt(N)end)if O then return true end end local O=
+pcall(function()local O=N.HoldDuration local P=N.Enabled N.HoldDuration=0 N.
+Enabled=true N:InputHoldBegin()task.wait()N:InputHoldEnd()N.HoldDuration=O N.
+Enabled=P end)if O then debugLog('Triggered prompt via native fallback')return
+true end local P=pcall(function()N.Triggered:Fire(ah)end)if P then debugLog(
+'Triggered prompt via event fire')return true end debugLog(
+'Failed to trigger proximity prompt - no method available')return false end
+local function _stabilizeRoot(N)if not N then return end local O=N:
+FindFirstChild('AF_Stabilizer')if not O then O=Instance.new('BodyVelocity')O.
+Name='AF_Stabilizer'O.Velocity=Vector3.zero O.MaxForce=Vector3.new(math.huge,
+math.huge,math.huge)O.Parent=N end return O end local function removeStabilizer(
+N)if not N then return end local O=N:FindFirstChild('AF_Stabilizer')if O then O:
+Destroy()end end local N='180436148'local O=nil local P=nil local function
+stopFallAnimations(Q)if not Q then return 0 end local R=0 for S,T in ipairs(Q:
+GetPlayingAnimationTracks())do local U=T.Animation and T.Animation.AnimationId
+or''if string.find(U,N)then T:Stop(0)R=R+1 end end return R end local function
+setupFallAnimationMonitor(Q)if O then O:Disconnect()O=nil end if P then P:
+Disconnect()P=nil end local R=Q:FindFirstChildOfClass('Humanoid')if not R then
+return end local S=R:FindFirstChildOfClass('Animator')if not S then S=R:
+WaitForChild('Animator',5)end if not S then debugLog(
+'Could not find Animator for fall monitor')return end O=S.AnimationPlayed:
+Connect(function(T)if not(az or aF)then return end local U=T.Animation and T.
+Animation.AnimationId or''if string.find(U,N)then T:Stop(0)debugLog(
+'Intercepted fall animation via AnimationPlayed')end end)P=R.StateChanged:
+Connect(function(T,U)if not(az or aF)then return end if U==Enum.
+HumanoidStateType.Freefall then task.delay(0.05,function()if az or aF then local
+W=stopFallAnimations(S)if W>0 then debugLog('Stopped '..W..
+' fall animation(s) on FreeFall state')end end end)end end)debugLog(
+'Fall animation monitor active')end local function setupFallAnimationDisabler()
+if ah.Character then setupFallAnimationMonitor(ah.Character)end ah.
+CharacterAdded:Connect(function(Q)local R=Q:WaitForChild('Humanoid',10)if R then
+task.wait(0.1)setupFallAnimationMonitor(Q)end end)end task.spawn(
+setupFallAnimationDisabler)local function safeTeleport(Q,R)if not Q or not R
+then return end Q.CFrame=R Q.AssemblyLinearVelocity=Vector3.zero Q.
+AssemblyAngularVelocity=Vector3.zero task.spawn(function()pcall(function()ah:
+RequestStreamAroundAsync(R.Position)end)end)end local function returnToStart()if
+not aB then debugLog('Cannot return to start: StartCFrame is nil.')return end
+local Q=ah.Character local R=Q and Q:FindFirstChild('HumanoidRootPart')if not R
+then return end debugLog('Returning to Start Position...')aI=nil b=nil s=nil c=
+tick()+2 aF=true R.Anchored=false removeStabilizer(R)for S,T in ipairs(Q:
+GetDescendants())do if T:IsA('BasePart')then T.CanCollide=true end end task.
+wait(0.3)local S=aB*CFrame.new(0,3,0)task.spawn(function()pcall(function()ah:
+RequestStreamAroundAsync(S.Position)end)end)local T=false for U=1,3 do R.CFrame=
+S R.AssemblyLinearVelocity=Vector3.zero R.AssemblyAngularVelocity=Vector3.zero
+task.wait(0.3)Q=ah.Character R=Q and Q:FindFirstChild('HumanoidRootPart')if not
+R then break end local W=(R.Position-S.Position).Magnitude if W<15 then T=true
+break end debugLog('Return attempt '..U..' failed (dist='..math.floor(W)..
+'), retrying...')end aB=nil aF=false if T then debugLog(
+'Successfully returned to start position')else warn(
+'[AF-v25] Failed to return to start after 3 attempts')end end local function
+getPlayerOrigins()local Q=af:FindFirstChild(ah.Name)if Q then local R=Q:
+FindFirstChild('Stats')if R then local S=R:FindFirstChild('Origins')if S and S:
+IsA('StringValue')then return S.Value end end end return nil end local function
+getPlayerLevel()local Q=af:FindFirstChild(ah.Name)if Q then local R=Q:
+FindFirstChild('Stats')if R then local S=R:FindFirstChild('Level')if S and S:
+IsA('IntValue')then return S.Value end end end return 0 end local function
+getInventoryCount(Q)local R=I[Q]if not R then return 0 end local S=af:
+FindFirstChild(ah.Name)local T=S and S:FindFirstChild('Stats')local U=T and T:
+FindFirstChild('Inventory')if not U then return 0 end local W=U:FindFirstChild(R
+)if W and W:IsA('IntValue')then return W.Value end return 0 end local function
+getAnyInventoryCount(Q)local R=af:FindFirstChild(ah.Name)local S=R and R:
+FindFirstChild('Stats')local T=S and S:FindFirstChild('Inventory')if not T then
+return 0 end local U=T:FindFirstChild(Q)if U and U:IsA('IntValue')then return U.
+Value end return 0 end local function getPlayerStats(Q)local R=af:
+FindFirstChild(Q)if not R then return nil end local S=R:FindFirstChild('Stats')
+if not S then return nil end local function readIntValue(T,U)local W=T:
+FindFirstChild(U)if W and(W:IsA('IntValue')or W:IsA('NumberValue'))then return W
+.Value end return nil end local function readStringValue(T,U)local W=T:
+FindFirstChild(U)if W and W:IsA('StringValue')then return W.Value end return nil
+end local T={Age=readIntValue(S,'Age'),Level=readIntValue(S,'Level'),Team=
+readStringValue(S,'Team'),Role=readStringValue(S,'Role'),Gold=readIntValue(S,
+'Gold'),Origins=readStringValue(S,'Origins'),Health=nil,MaxHealth=nil,Inventory=
+{}}local U=ab:FindFirstChild(Q)if U then local W=U.Character if W then local X=W
+:FindFirstChildOfClass('Humanoid')if X then T.Health=math.floor(X.Health)T.
+MaxHealth=math.floor(X.MaxHealth)end end end local W=S:FindFirstChild(
+'Inventory')if W then for X,Y in ipairs(W:GetChildren())do if Y:IsA('IntValue')
+and Y.Value>0 then T.Inventory[Y.Name]=Y.Value end end end return T end
+local function getPlayerTeamRelation(Q,R)if not Q or Q==''then return'none'end
+if not R or R==''then return'none'end if Q==R then return'friendly'end return
+'enemy'end local Q={}local function isPlayerKing(R,S)if not S or S==''then
+return false end local T=game:GetService('ReplicatedStorage'):FindFirstChild(
+'Civilizations')if not T then return false end local U=T:FindFirstChild(S)if not
+U then return false end local W=U:FindFirstChild('Leader')if not W then if not Q
+[S]then Q[S]=true debugLog('Leader field not found for civ: '..S)end return
+false end if W:IsA('StringValue')then return W.Value==R end return false end
+local function findNearestHouse()local R=af:FindFirstChild('Buildings')if not R
+then return nil,nil end local S=ah.Character local T=S and S:FindFirstChild(
+'HumanoidRootPart')if not T then return nil,nil end local U=T.Position local W=
+nil local X=math.huge local Y=nil for Z,_ in ipairs(R:GetChildren())do if _:IsA(
+'Model')then local aJ=string.match(_.Name,'^House(%d+)$')if aJ then local aK=_:
+GetPivot().Position local aL=(aK-U).Magnitude if aL<X then X=aL W=_ Y=aJ end end
+end end return W,Y end local function getHouseModel(aJ)if not aJ or aJ==''then
+return nil end local aK=af:FindFirstChild('Buildings')if not aK then return nil
+end return aK:FindFirstChild('House'..aJ)end local function getHouseStorage(aJ)
+if not aJ or aJ==''then return nil end local aK=af:FindFirstChild('Buildings')if
+not aK then return nil end local aL=aK:FindFirstChild('House'..aJ)if not aL then
+return nil end local R=aL:FindFirstChild('Storage')if R then local S=R:
+FindFirstChild('Storage')if S then return S end end return nil end
+local function _formatPrice(aJ)if aJ<1 then return string.format('$%.2f',aJ)
+elseif aJ==math.floor(aJ)then return string.format('$%d',math.floor(aJ))else
+return string.format('$%.1f',aJ)end end local function formatShopPrice(aJ,aK)aK=
+aK or 1 if aK>1 then return string.format('$%d / %d',aJ,aK)else return string.
+format('$%d',aJ)end end local function updateAllInventoryCounts()for aJ,aK in
+ipairs(ak)do o[aK]=getInventoryCount(aK)end end local function
+shouldPrioritizeResource(aJ)if not m then return true end if not ax[aJ]then
+return false end local aK=n[aJ]or 1 if aK==0 and not q then return false end
+return true end local function getAvailableCrops(aJ)local aK={}for aL,R in
+pairs(ap)do for S,T in ipairs(R.Ethnicity)do if T==aJ then table.insert(aK,R)
+break end end end table.sort(aK,function(aL,R)if aL.Level~=R.Level then return
+aL.Level<R.Level end return aL.Name<R.Name end)return aK end local function
+destroyPlantingUI()if ar and ar.Parent then ar:Destroy()end ar=nil aq=false as=
+nil end local function createPlantingUI(aJ,aK,aL)destroyPlantingUI()local R=
+getPlayerOrigins()local S=getPlayerLevel()if not R then a:Notify({Title=
+'Planting Error',Content='Could not determine your origins!',Type='Error',
+Duration=3})return end local T=getAvailableCrops(R)if#T==0 then a:Notify({Title=
+'No Crops',Content='No crops available for '..R,Type='Warning',Duration=3})
+return end as={plot=aJ,farm=aK,uniqueId=aL}local U=Instance.new('ScreenGui')U.
+Name='PlantingUI_Injected'U.ResetOnSpawn=false U.ZIndexBehavior=Enum.
+ZIndexBehavior.Sibling local W=Instance.new('Frame')W.Name='MainFrame'W.Size=
+UDim2.new(0,220,0,math.min(400,60+#T*36))W.Position=UDim2.new(1,-240,0.5,-W.Size
+.Y.Offset/2)W.BackgroundColor3=Color3.fromRGB(25,30,25)W.BorderSizePixel=0 W.
+Parent=U local X=Instance.new('UICorner')X.CornerRadius=UDim.new(0,8)X.Parent=W
+local Y=Instance.new('Frame')Y.Name='Header'Y.Size=UDim2.new(1,0,0,32)Y.
+BackgroundColor3=Color3.fromRGB(35,45,35)Y.BorderSizePixel=0 Y.Parent=W local Z=
+Instance.new('UICorner')Z.CornerRadius=UDim.new(0,8)Z.Parent=Y local _=Instance.
+new('TextLabel')_.Name='Title'_.Size=UDim2.new(1,-40,1,0)_.Position=UDim2.new(0,
+10,0,0)_.BackgroundTransparency=1 _.Text='Plant Crop ('..R..')'_.TextColor3=
+Color3.fromRGB(100,255,100)_.Font=Enum.Font.GothamBold _.TextSize=14 _.
+TextXAlignment=Enum.TextXAlignment.Left _.Parent=Y local aM=Instance.new(
+'TextButton')aM.Name='CloseBtn'aM.Size=UDim2.new(0,28,0,28)aM.Position=UDim2.
+new(1,-30,0,2)aM.BackgroundColor3=Color3.fromRGB(180,60,60)aM.Text='X'aM.
+TextColor3=Color3.fromRGB(255,255,255)aM.Font=Enum.Font.GothamBold aM.TextSize=
+14 aM.Parent=Y local aN=Instance.new('UICorner')aN.CornerRadius=UDim.new(0,6)aN.
+Parent=aM aM.MouseButton1Click:Connect(function()destroyPlantingUI()end)local aO
+=Instance.new('ScrollingFrame')aO.Name='CropList'aO.Size=UDim2.new(1,-10,1,-40)
+aO.Position=UDim2.new(0,5,0,36)aO.BackgroundTransparency=1 aO.ScrollBarThickness
+=6 aO.ScrollBarImageColor3=Color3.fromRGB(100,255,100)aO.CanvasSize=UDim2.new(0,
+0,0,#T*36)aO.Parent=W local aP=Instance.new('UIListLayout')aP.SortOrder=Enum.
+SortOrder.LayoutOrder aP.Padding=UDim.new(0,4)aP.Parent=aO for aQ,aR in ipairs(T
+)do local aS=S>=aR.Level local aT=Instance.new('TextButton')aT.Name='Crop_'..aR.
+Name aT.Size=UDim2.new(1,-10,0,32)aT.LayoutOrder=aQ aT.BackgroundColor3=aS and
+Color3.fromRGB(50,120,50)or Color3.fromRGB(120,50,50)aT.Text=string.format(
+'%s (Lvl %d, %ds)',aR.Name,aR.Level,aR.Time)aT.TextColor3=Color3.fromRGB(255,255
+,255)aT.Font=Enum.Font.Gotham aT.TextSize=12 aT.Parent=aO local aU=Instance.new(
+'UICorner')aU.CornerRadius=UDim.new(0,4)aU.Parent=aT aT.MouseButton1Click:
+Connect(function()if not as then return end local aV=game:GetService(
+'ReplicatedStorage'):FindFirstChild('Remotes')if aV then local aW=aV:
+FindFirstChild('Farming')if aW then aW:FireServer(aR.Name,as.farm.Name,as.
+uniqueId)a:Notify({Title='Planted!',Content=aR.Name..' planted on '..as.farm.
+Name,Type='Success',Duration=2})destroyPlantingUI()else a:Notify({Title='Error',
+Content='Farming remote not found!',Type='Error',Duration=3})end end end)end
+local aQ=pcall(function()U.Parent=aa end)if not aQ then U.Parent=ah:
+WaitForChild('PlayerGui')end ar=U aq=true end local function
+getBestCropForPlanting(aJ,aK)local aL=au[aJ]if not aL then return nil,false end
+local aM=ap[aL]if aM and aM.Level<=aK then return aL,false end local aN=
+getAvailableCrops(aJ)local aO=nil local aP=-1 for aQ,aR in ipairs(aN)do if aR.
+Level<=aK and aR.Level>aP then aO=aR.Name aP=aR.Level end end return aO,true end
+local function isValidPlotForPlanting(aJ,aK)local aL=aJ:GetAttribute('Growing')
+if aL==true then return false end for aM,aN in ipairs(aJ:GetChildren())do if aN:
+IsA('Model')then return false end end local aM=aK:GetAttribute('Owner')if aM~=ah
+.Name then return false end return true end local function stopAutofarm(aJ)az=
+false aI=nil b=nil s=nil M.Parent=nil local aK=ah.Character local aL=aK and aK:
+FindFirstChild('HumanoidRootPart')if aJ and aB then returnToStart()elseif aL
+then aL.Anchored=false removeStabilizer(aL)if aK then for aM,aN in ipairs(aK:
+GetDescendants())do if aN:IsA('BasePart')then aN.CanCollide=true end end end aB=
+nil end end local function Cleanup()aD=false aA=false t=false stopAutofarm(am.
+ReturnWhenIdle)for aJ,aK in pairs(L)do aK:Destroy()end L={}for aJ,aK in pairs(u)
+do if aK and aK.Parent then aK:Destroy()end end u={}for aJ,aK in pairs(v)do if
+aK and aK.Parent then aK:Destroy()end end v={}end ae.InputBegan:Connect(function
+(aJ,aK)if aJ.KeyCode==Enum.KeyCode.Backspace then if ae:IsKeyDown(Enum.KeyCode.
+Equals)then Cleanup()end end end)task.spawn(function()while aD do local aJ=ah.
+Character local aK=aJ and aJ:FindFirstChild('HumanoidRootPart')if aK then if aK.
+Position.Y<1200 then warn(
+'[AF-v25]: Void protection activated! Teleporting to safety.')if aB then
+debugLog('Void trap detected: Retrying return to StartCFrame.')safeTeleport(aK,
+aB*CFrame.new(0,10,0))else safeTeleport(aK,CFrame.new(0,1530,0))end a:Notify({
+Title='Void Protection',Content='Falling detected! Safety mechanisms engaged.',
+Type='Warning',Duration=5})task.wait(2)end end task.wait(0.1)end end)ad.Stepped:
+Connect(function()if az and ah.Character and not aF then for aJ,aK in ipairs(ah.
+Character:GetDescendants())do if aK:IsA('BasePart')and aK.CanCollide then aK.
+CanCollide=false end end if aI and aI.Instance then local aJ=aI.Instance for aK,
+aL in ipairs(aJ:GetDescendants())do if aL:IsA('BasePart')and aL.CanCollide then
+aL.CanCollide=false end end end end end)local function findMainPart(aJ)if not aJ
+then return nil end if aJ:IsA('BasePart')then return aJ end local aK={}for aL,aM
+in ipairs(aJ:GetDescendants())do if aM:IsA('BasePart')then table.insert(aK,aM)
+end end if#aK==0 then if aJ:IsA('Model')then return aJ end return nil end local
+aL={'Wood','Log','Trunk','Stem','Ore','Main',aJ.Name}for aM,aN in ipairs(aK)do
+for aO,aP in ipairs(aL)do if string.find(aN.Name,aP)then return aN end end end
+table.sort(aK,function(aM,aN)local aO=aM.Size.X*aM.Size.Y*aM.Size.Z local aP=aN.
+Size.X*aN.Size.Y*aN.Size.Z return aO>aP end)return aK[1]end local function
+getTargetData(aJ)local aK=findMainPart(aJ)if aK then if aK:IsA('Model')then
+local aL,aM=aK:GetBoundingBox()if aM.Magnitude<0.1 then aM=Vector3.new(4,4,4)end
+return aK:GetPivot().Position,aM,aK end return aK.Position,aK.Size,aK end if aJ:
+IsA('Model')then local aL,aM=aJ:GetBoundingBox()if aM.Magnitude<0.1 then aM=
+Vector3.new(4,4,4)end return aJ:GetPivot().Position,aM,nil end return nil,nil,
+nil end local function isOwned(aJ)local aK=ah.Name local aL=aJ while aL and aL~=
+af and aL.Name~='Buildings'do if aL:GetAttribute('Owner')==aK then return true
+end aL=aL.Parent end return false end local function isValidCrop(aJ,aK)if not aJ
+or not aJ:IsA('Model')then return false end if aJ:GetAttribute('Ready')~=true
+then return false end if aK~=nil then return aK end return isOwned(aJ)end
+local function updateResourceDropdown()local aJ=aj.Definitions[
+'SelectedResources']if not aJ then return end local aK={}for aL,aM in ipairs(ak)
+do local aN=e[aM]or 0 table.insert(aK,{Label=aM..' ('..aN..')',Value=aM})end aj.
+Definitions['SelectedResources'].Options=aK if aj.UIElements then local aL=aj.
+UIElements['SelectedResources']if aL and aL.Refresh then aL.Refresh(aL,aK,nil)
+end end end local function identifyResource(aJ)local aK=aJ.Name local aL=nil if
+aK=='Tree'then if aJ:GetAttribute('Amount')==2 then local aM=aJ:FindFirstChild(
+'Trunk')or aJ:FindFirstChild('Wood')or aJ:FindFirstChild('Log')or aJ:
+FindFirstChild('Main')if aM and aM:IsA('BasePart')and aM.Size.Y>75 then aL=
+'Wood'else aL='Big Wood'end else aL='Wood'end elseif aK=='Rock'or aK=='Stone'
+then aL='Stone'elseif aK=='Iron'then aL='Iron'elseif aK=='Coal'then aL='Coal'
+elseif aK=='Clay'then aL='Clay'elseif aK=='Copper'then aL='Copper'elseif aK==
+'Tin'then aL='Tin'elseif aK=='Sand'then aL='Sand'elseif aK=='Sulfur'then aL=
+'Sulfur'end return aL end local function scanResources()local aJ=af:
+FindFirstChild('Resources')local aK=af:FindFirstChild('Buildings')local aL=ah.
+Character and ah.Character.PrimaryPart and ah.Character.PrimaryPart.Position or
+Vector3.zero local aM={}local aN={}local aO=0 local aP=tick()if aJ then local aQ
+=aJ:GetChildren()for aR,aS in ipairs(aQ)do if aS:IsA('Model')then local aT=
+identifyResource(aS)if aT then aN[aT]=(aN[aT]or 0)+1 aO=aO+1 local aU=az and ax[
+aT]==true if aU or aA then local aV=findMainPart(aS)if aV then local aW=false if
+aH[aS]then if aP<aH[aS]then aW=true else aH[aS]=nil end end local R if aV:IsA(
+'Model')then R=aV:GetPivot().Position else R=aV.Position end table.insert(aM,{
+Instance=aV,Model=aS,Type=aT,IsBlacklisted=aW,IsFarmTarget=aU,Position=R})end
+end end end end end if aK and(am.AutoFarmCrops or am.AutoWater or am.AutoPlant
+or aA)then for aQ,aR in ipairs(aK:GetChildren())do if aR:IsA('Model')and(string.
+find(aR.Name,'Farm')or string.find(aR.Name,'Garden'))then local aS=aR:GetPivot()
+.Position if(aS-aL).Magnitude<(aG*1.5)then local aT=isOwned(aR)for aU,aV in
+ipairs(aR:GetDescendants())do local aW=aV.Name if aV:IsA('Model')and aW~=
+'ClayPot'and isValidCrop(aV,aT)then al[aW]=true local R=am.AutoFarmCrops==true
+if R or aA then aN[aW]=(aN[aW]or 0)+1 aO=aO+1 local S=d[aV]or findMainPart(aV)if
+S then d[aV]=S table.insert(aM,{Instance=S,Model=aV,Type=aW,IsBlacklisted=aH[aV]
+and aP<aH[aV],IsFarmTarget=R,Position=S.Position})end end elseif aV.Name=='Plot'
+and am.AutoWater then local R=aV:GetAttribute('Water')or aV:GetAttribute('water'
+)if R and R<=70 then if aT or isOwned(aV)then local S=aV:FindFirstChild(
+'ProximityPrompt',true)if S and(S.ActionText=='Water'or S.Name=='Water')then
+local T=d[aV]or findMainPart(aV)if T then d[aV]=T table.insert(aM,{Instance=T,
+Model=aV,Type='Water',IsBlacklisted=aH[aV]and aP<aH[aV],IsFarmTarget=true,
+Position=T.Position})end end end end elseif aV.Name=='Plot'and am.AutoPlant then
+if isValidPlotForPlanting(aV,aR)then local R=aV:GetAttribute('UniqueID')if R
+then local S=d[aV]or findMainPart(aV)if S then d[aV]=S table.insert(aM,{Instance
+=S,Model=aV,Type='Plant',IsBlacklisted=aH[aV]and aP<aH[aV],IsFarmTarget=true,
+Position=S.Position,Farm=aR,UniqueID=R})end end end end end end end end end e=aN
+f=aO ay=aM updateResourceDropdown()end local function scanForTargets()
+scanResources()end local function blacklistTarget(aJ)if not aJ then return end
+local aK=tick()aH[aJ]=aK+am.BlacklistDuration local aL=getTargetData(aJ)if aL
+then for aM,aN in ipairs(ay)do if aN.Model~=aJ and not aN.IsBlacklisted then
+local aO=getTargetData(aN.Model)if aO and(aL-aO).Magnitude<10 then aH[aN.Model]=
+aK+am.BlacklistDuration end end end end end local function getPlayerESPColor(aJ,
+aK)if aK then if aJ=='friendly'then return K.FriendlyKing else return K.
+EnemyKing end end if aJ=='friendly'then return K.Friendly elseif aJ=='enemy'then
+return K.Enemy end return K.Neutral end local function color3ToHex(aJ)return
+string.format('#%02X%02X%02X',math.floor(aJ.R*255),math.floor(aJ.G*255),math.
+floor(aJ.B*255))end local function createBillboardLabel(aJ,aK,aL)local aM=
+Instance.new('TextLabel')aM.Name=aK aM.Size=UDim2.new(1,0,0,10)aM.
+BackgroundTransparency=1 aM.TextColor3=Color3.fromRGB(255,255,255)aM.Font=Enum.
+Font.GothamBold aM.TextSize=9 aM.TextStrokeTransparency=0 aM.TextStrokeColor3=
+Color3.fromRGB(0,0,0)aM.RichText=true aM.LayoutOrder=aL aM.TextXAlignment=Enum.
+TextXAlignment.Center aM.Parent=aJ return aM end local function
+createPlayerBillboard(aJ)local aK=aJ.Character if not aK then return nil end
+local aL=aK:FindFirstChild('Head')if not aL then return nil end local aM=
+Instance.new('BillboardGui')aM.Name='AF_PlayerESP_'..aJ.Name aM.Adornee=aL aM.
+Size=UDim2.new(0,180,0,160)aM.StudsOffset=Vector3.new(0,3,0)aM.AlwaysOnTop=true
+aM.ResetOnSpawn=false aM.MaxDistance=w aM.LightInfluence=0 local aN=Instance.
+new('Frame')aN.Name='Background'aN.Size=UDim2.new(1,0,1,0)aN.
+BackgroundTransparency=1 aN.BorderSizePixel=0 aN.Parent=aM local aO=Instance.
+new('UICorner')aO.CornerRadius=UDim.new(0,4)aO.Parent=aN local aP=Instance.new(
+'UIPadding')aP.PaddingTop=UDim.new(0,2)aP.PaddingBottom=UDim.new(0,2)aP.
+PaddingLeft=UDim.new(0,4)aP.PaddingRight=UDim.new(0,4)aP.Parent=aN local aQ=
+Instance.new('UIListLayout')aQ.SortOrder=Enum.SortOrder.LayoutOrder aQ.Padding=
+UDim.new(0,0)aQ.HorizontalAlignment=Enum.HorizontalAlignment.Center aQ.Parent=aN
+createBillboardLabel(aN,'NameLine',1)createBillboardLabel(aN,'HealthLine',2)
+createBillboardLabel(aN,'StatsLine1',3)createBillboardLabel(aN,'StatsLine2',4)
+createBillboardLabel(aN,'DistanceLine',5)createBillboardLabel(aN,'InventoryLine'
+,6)local aR=pcall(function()aM.Parent=aa end)if not aR then aM.Parent=ah:
+WaitForChild('PlayerGui')end return aM end local function updatePlayerBillboard(
+aJ,aK,aL,aM,aN,aO)if not aK then return end local aP=aK:FindFirstChild(
+'Background')if not aP then return end local aQ=getPlayerESPColor(aM,aN)local aR
+=color3ToHex(aQ)aK.MaxDistance=w local aS=aP:FindFirstChild('NameLine')if aS
+then local aT=aN and' \u{1f451}'or''aS.Text=string.format(
+"<font color='%s'>%s%s</font>",aR,aJ.Name,aT)end local aT=aP:FindFirstChild(
+'HealthLine')if aT then local aU=aL and aL.Health or'?'local aV=aL and aL.
+MaxHealth or'?'local aW='#00FF00'if aL and aL.Health and aL.MaxHealth and aL.
+MaxHealth>0 then local R=aL.Health/aL.MaxHealth if R<0.3 then aW='#FF3333'elseif
+R<0.6 then aW='#FFAA00'end end aT.Text=string.format(
+"HP: <font color='%s'>%s/%s</font>",aW,tostring(aU),tostring(aV))end local aU=aP
+:FindFirstChild('StatsLine1')if aU then local aV=aL and aL.Age or'?'local aW=aL
+and aL.Level or'?'local R=aL and aL.Role or'?'aU.Text=string.format(
+'Age:%s Lv:%s %s',tostring(aV),tostring(aW),tostring(R))end local aV=aP:
+FindFirstChild('StatsLine2')if aV then local aW=aL and aL.Team or'None'local R=
+aL and aL.Gold or'?'aV.Text=string.format("<font color='%s'>%s</font> | Gold:%s"
+,aR,tostring(aW),tostring(R))end local aW=aP:FindFirstChild('DistanceLine')if aW
+then if z and aO then aW.Text=string.format('Distance: %dm',math.floor(aO))aW.
+Visible=true else aW.Visible=false end end local R=aP:FindFirstChild(
+'InventoryLine')if R then if y and aL and aL.Inventory then local S={}for T,U in
+pairs(aL.Inventory)do table.insert(S,T..':'..U)end if#S>0 then table.sort(S)
+local T=table.concat(S,', ')R.TextWrapped=true R.Text=T R.TextSize=8 R.Visible=
+true local U=#T local W=40 local X=math.ceil(U/W)if X>3 then X=3 end if X<1 then
+X=1 end R.Size=UDim2.new(1,0,0,X*9)else R.Text='Empty'R.TextSize=8 R.Size=UDim2.
+new(1,0,0,9)R.Visible=true end else R.Visible=false R.Size=UDim2.new(1,0,0,0)end
+end local S=6 for T,U in ipairs(aP:GetChildren())do if U:IsA('TextLabel')and U.
+Visible then S=S+U.Size.Y.Offset end end aK.Size=UDim2.new(0,180,0,S)end
+local function removePlayerBillboard(aJ)local aK=u[aJ]if aK then if aK.Parent
+then aK:Destroy()end u[aJ]=nil end end local function managePlayerHighlight(aJ,
+aK,aL,aM)if not A then local aN=v[aJ]if aN and aN.Parent then aN:Destroy()end v[
+aJ]=nil return end local aN=aJ.Character if not aN then return end local aO=
+getPlayerESPColor(aK,aL)local aP=v[aJ]if not aP or not aP.Parent then aP=
+Instance.new('Highlight')aP.Name='AF_PlayerHighlight'aP.Adornee=aN aP.
+OutlineTransparency=0 aP.Parent=aa v[aJ]=aP end aP.FillColor=aO aP.OutlineColor=
+aO aP.FillTransparency=aM or x if aP.Adornee~=aN then aP.Adornee=aN end end
+local function removePlayerHighlight(aJ)local aK=v[aJ]if aK then if aK.Parent
+then aK:Destroy()end v[aJ]=nil end end local function cleanupAllPlayerESP()for
+aJ,aK in pairs(u)do if aK and aK.Parent then aK:Destroy()end end u={}for aJ,aK
+in pairs(v)do if aK and aK.Parent then aK:Destroy()end end v={}end ab.
+PlayerRemoving:Connect(function(aJ)removePlayerBillboard(aJ)
+removePlayerHighlight(aJ)F[aJ]=nil end)local function manageESP()local aJ=az or
+am.AutoFarmCrops or am.AutoPlant if not aJ then M.Parent=nil end if not aA then
+for aK,aL in pairs(L)do aL:Destroy()end L={}return end local aK=ah.Character and
+ah.Character.PrimaryPart and ah.Character.PrimaryPart.Position or Vector3.zero
+local aL={}for aM,aN in ipairs(ay)do if aN.Instance and aN.Instance.Parent then
+table.insert(aL,aN)end end if#aL>200 then local aM={}local aN={}for aO,aP in
+ipairs(aL)do if aP.IsFarmTarget then table.insert(aM,aP)else table.insert(aN,aP)
+end end aL=aM for aO,aP in ipairs(aN)do table.insert(aL,aP)end else table.sort(
+aL,function(aM,aN)if aM.IsFarmTarget~=aN.IsFarmTarget then return aM.
+IsFarmTarget end if aM.IsBlacklisted~=aN.IsBlacklisted then return not aM.
+IsBlacklisted end local aO=aM.Position or Vector3.zero local aP=aN.Position or
+Vector3.zero return(aO-aK).Magnitude<(aP-aK).Magnitude end)end local aM,aN=30,{}
+for aO,aP in ipairs(aL)do local aQ=(aP.Position-aK).Magnitude if aO<=aM and aQ<=
+aG then local aR=aP.Instance local aS=L[aR]if not aS then aS=Instance.new(
+'Highlight')aS.FillTransparency=0.6 aS.OutlineTransparency=0 aS.Adornee=aP.Model
+or aR aS.Parent=aa end if aP.IsBlacklisted then aS.FillColor=Color3.fromRGB(255,
+140,0)aS.OutlineColor=Color3.fromRGB(255,50,0)elseif aP.IsFarmTarget then aS.
+FillColor=Color3.fromRGB(0,255,0)aS.OutlineColor=Color3.fromRGB(255,255,255)else
+local aT=J[aP.Type]if not aT then aT=al[aP.Type]and Color3.fromRGB(255,215,0)or
+Color3.fromRGB(0,255,150)end aS.FillColor=aT aS.OutlineColor=Color3.fromRGB(255,
+255,255)end aN[aR]=aS elseif L[aP.Instance]then L[aP.Instance]:Destroy()end end
+for aO,aP in pairs(L)do if not aN[aO]then aP:Destroy()end end L=aN end task.
+spawn(function()while aD do scanResources()manageESP()task.wait(am.ScanInterval)
+end end)task.spawn(function()local aJ=game:GetService('ReplicatedStorage'):
+WaitForChild('Remotes'):WaitForChild('Gathering')while aD do if am.
+StorageActionInProgress then task.wait(0.5)continue end if aI and aI.Model then
+if not isValidInstance(aI.Model)then local aK=aI.Type if aK then p[aK]=(p[aK]or
+0)+1 end aI=nil end end local aK=az or am.AutoFarmCrops or am.AutoWater or am.
+AutoPlant if aK and aI and aI.Model then local aL=aI.Type if aL=='Water'then if
+am.AutoWater then local aM=aI.Model local aN=aM:FindFirstChild('ProximityPrompt'
+,true)if aN and(aN.ActionText=='Water'or aN.Name=='Water')then if am.Debug then
+debugLog('Auto-Watering '..aM:GetFullName())end triggerProximityPrompt(aN)end
+end elseif aL=='Plant'and am.AutoPlant then local aM=aI.Farm local aN=aI.
+UniqueID if aM and aN then local aO=getPlayerOrigins()local aP=getPlayerLevel()
+if aO then local aQ,aR=getBestCropForPlanting(aO,aP)if aQ then local aS=(game:
+GetService('ReplicatedStorage'):WaitForChild('Remotes')::Folder):FindFirstChild(
+'Farming')if aS then aS:FireServer(aQ,aM.Name,aN)if am.Debug then local aT=aR
+and('Auto-Planting '..aQ..' (downgraded from preference)')or('Auto-Planting '..
+aQ)debugLog(aT)end aH[aI.Model]=tick()+20 end end end end elseif am.AutoMine or
+am.AutoFarmCrops then aJ:FireServer(aI.Model)end end task.wait(am.MineInterval)
+end end)executeStorageOperation=function(aJ,aK,aL)if not aJ or aJ==''then return
+false end am.StorageActionInProgress=true local aM=aI local aN=b local aO=s aI=
+nil b=nil s=nil local aP=aF aF=true local aQ=getHouseModel(aJ)if not aQ then if
+not aL then a:Notify({Title='House Not Found',Content='House'..aJ..
+' does not exist!',Type='Error',Duration=4})end aF=aP am.StorageActionInProgress
+=false return false end local aR=am.AutoStorageTP local aS=nil local aT=ah.
+Character and ah.Character:FindFirstChild('HumanoidRootPart')local aU=false
+local aV=getHouseStorage(aJ)if aR and aT then aS=aT.CFrame aU=true aT.Anchored=
+false removeStabilizer(aT)local aW=aQ:GetPivot()safeTeleport(aT,aW+Vector3.new(0
+,5,0))local R=tick()while(tick()-R)<3 do aV=getHouseStorage(aJ)if aV then break
+end task.wait(0.1)end task.wait(1)if not aV then if not aL then a:Notify({Title=
+'Render Timeout',Content='Storage for House'..aJ..' failed to load.',Type=
+'Warning',Duration=3})end if aS then safeTeleport(aT,aS)end aF=aP am.
+StorageActionInProgress=false return false end elseif not aV then if not aL then
+a:Notify({Title='Storage Missing',Content='House'..aJ..
+' storage is not rendered. Enable Auto-TP.',Type='Error',Duration=4})end aF=aP
+am.StorageActionInProgress=false return false end local aW=game:GetService(
+'ReplicatedStorage'):WaitForChild('Remotes'):FindFirstChild('Storage')local R=
+false if aW then if aK=='Transfer'or aK=='Both'then pcall(function()aW:
+FireServer('TransferAll',aV)end)end if aK=='Both'then task.wait(0.1)end if aK==
+'Take'or aK=='Both'then pcall(function()aW:FireServer('TakeAll',aV)end)end R=
+true if not aL then debugLog('Executed '..aK..' on House'..aJ)end task.wait(1)
+end if aU and aS and aT then task.wait(0.2)safeTeleport(aT,aS)end aF=aP am.
+StorageActionInProgress=false return R end task.spawn(function()local aJ=0 while
+aD do local aK=am.AutoStorageTransferEnabled local aL=am.AutoStorageTakeEnabled
+if aK or aL then local aM=am.AutoStorageHouseId if aM~=''then local aN if aK and
+aL then aN='Both'elseif aK then aN='Transfer'else aN='Take'end local aO=
+executeStorageOperation(aM,aN,true)if not aO then local aP=getHouseModel(aM)if
+not aP then local aQ=tick()if aQ-aJ>10 then aJ=aQ a:Notify({Title=
+'Auto-Storage Error',Content='House'..aM..' not found!',Type='Error',Duration=4}
+)end end end end end task.wait(am.AutoStorageInterval or 5)end end)task.spawn(
+function()while aD do task.wait(60)local aJ=tick()local aK=0 for aL,aM in pairs(
+aH)do if aJ>=aM or not isValidInstance(aL)then aH[aL]=nil aK=aK+1 end end if ay
+then for aL=#ay,1,-1 do local aM=ay[aL]if not aM.Instance or not
+isValidInstance(aM.Instance)then table.remove(ay,aL)end end end if am.Debug and
+aK>0 then debugLog('Cleanup: Removed '..aK..' stale blacklist entries')end end
+end)local aJ local function updateTimeoutVisuals(aK,aL)if not aJ then return end
+if not aK then aJ:Set(0)return end local aM=math.max(0,am.TimeoutSeconds-aL)
+local aN=aM/am.TimeoutSeconds aJ:Set(aN)if aN>0.5 then aJ:UpdateColor(Color3.
+fromRGB(0,255,100))elseif aN>0.25 then aJ:UpdateColor(Color3.fromRGB(255,200,0))
+else aJ:UpdateColor(Color3.fromRGB(255,50,50))end end local aK local aL={}local
+aM=nil local function refreshBlacklistUI()if not aK then return end local aN=
+tick()for aO,aP in pairs(aL)do if not aH[aO]or aN>=aH[aO]then if aP.Destroy then
+aP:Destroy()end aL[aO]=nil end end local aO={}for aP,aQ in pairs(aH)do if aN<aQ
+then table.insert(aO,{Inst=aP,Rem=aQ-aN})else aH[aP]=nil if aL[aP]then if aL[aP]
+.Destroy then aL[aP]:Destroy()end aL[aP]=nil end end end table.sort(aO,function(
+aP,aQ)return aP.Rem>aQ.Rem end)if#aO==0 then if not aM and aK then aM=aK:Label(
+'No active blacklists')elseif aM then aM:Set('No active blacklists')end else if
+aM then if aM.Set then aM:Set('')end end end for aP,aQ in ipairs(aO)do local aR=
+aQ.Inst local aS=aQ.Rem local aT=aL[aR]if not aT then local aU=aK:TimerItem(aR.
+Name or'Unknown',tick()+aS,function()aH[aR]=nil refreshBlacklistUI()end)aL[aR]=
+aU else if aT.UpdateExpiry then aT:UpdateExpiry(tick()+aS)end end end end
+local function getPriceFromValue(aN)if not aN then return 0,0,0,1 end local aO=
+aN:GetAttribute('Price')or 0 local aP=aN:GetAttribute('Amount')or 1 local aQ=aN.
+Value local aR=aP if aR<=0 then aR=1 end local aS=aO/aR return aS,aQ,aO,aR end
+local function scanStock(aN,aO,aP,aQ)local aR=aN:FindFirstChild('Stock')if not
+aR then return end for aS,aT in ipairs(aR:GetChildren())do if aT:IsA('IntValue')
+and aT.Value>0 then local aU,aV,aW,R=getPriceFromValue(aT)table.insert(aQ,{Name=
+aT.Name,Civilization=aO,Section=aP,Stall=aN,StallPos=aN:GetPivot().Position,
+Stock=aV,UnitPrice=aU,RawPrice=aW,BatchSize=R,ItemValue=aT})end end end
+local function reindexStall(aN)if not aN then return end local aO='Small Store'
+local aP='Unknown'local aQ=aN.Parent if aQ and aQ.Name=='Markets'then local aR=
+aQ.Parent aP=aR and aR.Name or'Unknown'else for aR,aS in ipairs(aw)do if string.
+find(aN.Name,'^'..aS)then aO=aS break end end end local aR={}for aS,aT in
+ipairs(g)do if aT.Stall~=aN then table.insert(aR,aT)end end scanStock(aN,aP,aO,
+aR)g=aR local aS=ah.Character local aT=aS and aS:FindFirstChild(
+'HumanoidRootPart')local aU=aT and aT.Position or Vector3.new(0,0,0)local aV=aj.
+Values['MarketSortMode']or'Name'table.sort(g,function(aW,R)if aV=='Price'then if
+aW.UnitPrice==R.UnitPrice then return aW.Name<R.Name end return aW.UnitPrice<R.
+UnitPrice elseif aV=='Distance'then local S=(aW.StallPos-aU).Magnitude local T=(
+R.StallPos-aU).Magnitude if math.abs(S-T)<1 then return aW.Name<R.Name end
+return S<T else if aW.Name==R.Name then return aW.UnitPrice<R.UnitPrice end
+return aW.Name<R.Name end end)end local aN={['Small Store']='#FFFFFF',['Forge']=
+'#FF8C00',['Artisan']='#FFD700',['Restaurant']='#00FF00',['Resturant']='#00FF00'
+,['Restuarant']='#00FF00',['Tailor Shop']='#FF69B4',['Trading Post']='#00BFFF'}
+local function scanMarkets()local aO={}local aP=af:FindFirstChild(
+'Civilizations')if aP then for aQ,aR in ipairs(aP:GetChildren())do local aS=aR:
+FindFirstChild('Markets')if aS then for aT,aU in ipairs(aS:GetChildren())do if
+aU:IsA('Model')then scanStock(aU,aR.Name,'Small Store',aO)end end end end end
+local aQ=af:FindFirstChild('Buildings')if aQ then for aR,aS in ipairs(aQ:
+GetChildren())do if aS:IsA('Model')then for aT,aU in ipairs(aw)do if string.
+find(aS.Name,'^'..aU)then scanStock(aS,'None',aU,aO)break end end end end end
+local aR=ah.Character local aS=aR and aR:FindFirstChild('HumanoidRootPart')local
+aT=aS and aS.Position or Vector3.new(0,0,0)local aU=aj.Values['MarketSortMode']
+or'Name'table.sort(aO,function(aV,aW)if aU=='Price'then if aV.UnitPrice==aW.
+UnitPrice then return aV.Name<aW.Name end return aV.UnitPrice<aW.UnitPrice
+elseif aU=='Distance'then local R=(aV.StallPos-aT).Magnitude local S=(aW.
+StallPos-aT).Magnitude if math.abs(R-S)<1 then return aV.Name<aW.Name end return
+R<S else if aV.Name==aW.Name then return aV.UnitPrice<aW.UnitPrice end return aV
+.Name<aW.Name end end)g=aO end local function buyMarketItem(aO)if not aO or not
+aO.Stall or not aO.ItemValue then return end if getMarketRemote()then
+getMarketRemote():FireServer(aO.Stall,'BuyItem',aO.Name)task.delay(0.1,function(
+)reindexStall(aO.Stall)end)end end local function readStockFolder(aO)local aP={}
+if aO then for aQ,aR in ipairs(aO:GetChildren())do if aR:IsA('IntValue')then aP[
+aR.Name]={Stock=aR.Value,Price=aR:GetAttribute('Price')or 0,BatchSize=aR:
+GetAttribute('Amount')or 1,ItemValue=aR}end end end return aP end local function
+scanPlayerStores()local aO={}local aP=ah.Name local aQ=af:FindFirstChild(
+'Civilizations')if aQ then for aR,aS in ipairs(aQ:GetChildren())do local aT=aS:
+FindFirstChild('Markets')if aT then for aU,aV in ipairs(aT:GetChildren())do if
+aV:IsA('Model')then local aW=aV:FindFirstChild('Owner')if aW and aW:IsA(
+'StringValue')and aW.Value==aP then local R=readStockFolder(aV:FindFirstChild(
+'Stock'))aO[aV]={Name='Small Store ('..aS.Name..')',Type='Small Store',Stock=R,
+Position=aV:GetPivot().Position,Model=aV}end end end end end end local aR=af:
+FindFirstChild('Buildings')if aR then for aS,aT in ipairs(aR:GetChildren())do if
+aT:IsA('Model')then for aU,aV in ipairs(aw)do if string.find(aT.Name,'^'..aV)
+then local aW=aT:FindFirstChild('Owner')local R=nil if aW and aW:IsA(
+'StringValue')then R=aW.Value else R=aT:GetAttribute('Owner')end if R==aP then
+local S=readStockFolder(aT:FindFirstChild('Stock'))aO[aT]={Name=aT.Name,Type=aV,
+Stock=S,Position=aT:GetPivot().Position,Model=aT}end break end end end end end h
+=aO return aO end local function reindexPlayerStore(aO)if not aO then return end
+if not h[aO]then scanPlayerStores()if not h[aO]then return end end local aP=h[aO
+]local aQ=readStockFolder(aO:FindFirstChild('Stock'))aP.Stock=aQ h[aO]=aP end
+local aO=setmetatable({},{__mode='k'})local function injectPlantPrompt(aP)if aP.
+ActionText~='Plant'then return end if aO[aP]then return end aP.ActionText=
+'PlantInjected'aO[aP]=true if am.Debug then debugLog('Injected prompt: '..aP:
+GetFullName())end end local function scanAndInjectPrompts()if not am.
+FarmWithoutFarmer then return end local aP=af:FindFirstChild('Buildings')if aP
+then for aQ,aR in ipairs(aP:GetDescendants())do if aR:IsA('ProximityPrompt')then
+injectPlantPrompt(aR)end end end end aj:Define('AutofarmEnabled',{Category=
+'Main',Type='Toggle',Name='Auto-Farm',Default=false,Callback=function(aP)if aP
+then az=true if not aB and ah.Character and ah.Character:FindFirstChild(
+'HumanoidRootPart')then aB=ah.Character.HumanoidRootPart.CFrame debugLog(
+'StartCFrame captured (Auto-Farm)')end a:Notify({Title='Autofarm Started',
+Content='Mining selected resources...',Type='Success',Duration=2})else
+stopAutofarm(am.ReturnWhenIdle)a:Notify({Title='Autofarm Stopped',Content=am.
+ReturnWhenIdle and'Returned to start position'or'Stopped at current position',
+Type='Info',Duration=2})end end,Cleanup=function()stopAutofarm(false)end})aj:
+Define('AutoFarmCrops',{Category='Main',Type='Toggle',Name='Auto-Farm Crops',
+Description='Ignores Target Resources dropdown',Default=false,Callback=function(
+aP)am.AutoFarmCrops=aP if aP and not aB and ah.Character and ah.Character:
+FindFirstChild('HumanoidRootPart')then aB=ah.Character.HumanoidRootPart.CFrame
+debugLog('StartCFrame captured (Crops)')end scanForTargets()manageESP()end,
+Cleanup=function()am.AutoFarmCrops=false end})aj:Define('ESPEnabled',{Category=
+'Main',Type='Toggle',Name='ESP Highlights',Default=false,Callback=function(aP)aA
+=aP scanResources()manageESP()end,Cleanup=function()aA=false end})aj:Define(
+'AutoMine',{Category='Main',Type='Toggle',Name='Auto Mine',Default=true,Callback
+=function(aP)am.AutoMine=aP end,Cleanup=function()am.AutoMine=false end})aj:
+Define('SelectedResources',{Category='Main',Type='Dropdown',Name=
+'Target Resources',Options=ak,Default={},MultiSelect=true,Callback=function(aP)
+for aQ,aR in ipairs(ak)do ax[aR]=false end for aQ,aR in pairs(al)do ax[aQ]=false
+end if type(aP)=='table'then for aQ,aR in ipairs(aP)do ax[aR]=true end elseif
+type(aP)=='string'then ax[aP]=true end scanForTargets()manageESP()end,Cleanup=
+function()end})aj:Define('TeleportMode',{Category='Settings',Type='Dropdown',
+Name='Teleport Mode',Options={'Underground','Smart','Center'},Default=
+'Underground',Callback=function(aP)am.TeleportMode=aP end,Cleanup=function()am.
+TeleportMode='Underground'end})aj:Define('TeleportDelay',{Category='Settings',
+Type='Slider',Name='Teleport Delay (s)',Default=0,Min=0,Max=10,Callback=function
+(aP)am.TeleportDelay=aP end,Cleanup=function()end})aj:Define('TimeoutSeconds',{
+Category='Settings',Type='Slider',Name='Mining Timeout (s)',Default=20,Min=5,Max
+=60,Callback=function(aP)am.TimeoutSeconds=aP end,Cleanup=function()end})aj:
+Define('ReturnWhenIdle',{Category='Settings',Type='Toggle',Name=
+'Return to Start when Idle',Default=true,Callback=function(aP)am.ReturnWhenIdle=
+aP end,Cleanup=function()am.ReturnWhenIdle=true end})aj:Define('ScanInterval',{
+Category='Settings',Type='Slider',Name='Scan Interval (s)',Default=2,Min=0.1,Max
+=10,Callback=function(aP)am.ScanInterval=aP end,Cleanup=function()end})aj:
+Define('RenderDistance',{Category='Settings',Type='Slider',Name='ESP Distance',
+Description=[[Max distance for ESP highlights (does not limit farming reach)]],
+Default=1000,Min=100,Max=10000,Callback=function(aP)aG=aP end,Cleanup=function()
+end})aj:Define('MineInterval',{Category='Settings',Type='Slider',Name=
+'Mine Interval (s)',Default=0.2,Min=0.1,Max=1,Callback=function(aP)am.
+MineInterval=aP end,Cleanup=function()end})aj:Define('DebugMode',{Category=
+'Settings',Type='Toggle',Name='Debug Mode',Default=false,Callback=function(aP)am
+.Debug=aP end,Cleanup=function()end})aj:Define('DisableKillblocks',{Category=
+'Misc',Type='Toggle',Name='Disable Killblocks',Default=false,Callback=function(
+aP)aE=aP end,Cleanup=function()aE=false end})aj:Define('FarmWithoutFarmer',{
+Category='Misc',Type='Toggle',Name='Farm Without Farmer',Default=false,Callback=
+function(aP)am.FarmWithoutFarmer=aP if aP then task.defer(function()if
+scanAndInjectPrompts then scanAndInjectPrompts()end end)else if
+destroyPlantingUI then destroyPlantingUI()end end end,Cleanup=function()am.
+FarmWithoutFarmer=false if destroyPlantingUI then destroyPlantingUI()end end})aj
+:Define('AutoEat',{Category='Misc',Type='Toggle',Name='Auto Eat from Inventory',
+Default=false,Callback=function(aP)am.AutoEat=aP end,Cleanup=function()am.
+AutoEat=false end})aj:Define('AutoEatMax',{Category='Misc',Type='Slider',Name=
+'Max Food per Cycle',Description=
+[[Maximum food items to consume at once (1 recommended to avoid waste)]],Default
+=1,Min=1,Max=10,Callback=function(aP)am.AutoEatMax=aP end,Cleanup=function()am.
+AutoEatMax=1 end})aj:Define('AutoHeal',{Category='Misc',Type='Toggle',Name=
+'Auto Heal from Inventory',Default=false,Callback=function(aP)am.AutoHeal=aP end
+,Cleanup=function()am.AutoHeal=false end})aj:Define('AutoHealMax',{Category=
+'Misc',Type='Slider',Name='Max Medicines per Cycle',Description=
+[[Maximum medicines to consume at once (up to 4 for faster healing)]],Default=4,
+Min=1,Max=10,Callback=function(aP)am.AutoHealMax=aP end,Cleanup=function()am.
+AutoHealMax=4 end})aj:Define('AutoWater',{Category='Misc',Type='Toggle',Name=
+'Auto-Water Crops',Default=false,Callback=function(aP)am.AutoWater=aP if aP and
+not aB and ah.Character and ah.Character:FindFirstChild('HumanoidRootPart')then
+aB=ah.Character.HumanoidRootPart.CFrame debugLog(
+'StartCFrame captured (Watering)')end end,Cleanup=function()am.AutoWater=false
+end})aj:Define('UnlockAllBuildings',{Category='Misc',Type='Toggle',Name=
+'Unlock All Buildings',Description=
+[[Patches modules to unlock all buildings for any class (permanent until rejoin)]]
+,Default=false,Callback=function(aP)if aP then local aQ,aR=pcall(function()local
+aQ=game:GetService('ReplicatedStorage')local aR=(require::any)(aQ:WaitForChild(
+'Building_Module'))local aS=(require::any)(aQ:WaitForChild('Class_Module'))for
+aT,aU in pairs(aR)do aU.Class='Farmer'aU.Tech=nil end local aT={'Arena',
+'Artisan','Barn','Bronze Statue','Cannon','Cemetary','Colosseum','Dock','Farm',
+'Forge','Garden','Great Wall of China','Hospital','House','Justice Court',
+'Library','Lighthouse of Alexandria','Military Camp','Mott','Notre-Dame',
+'Prison','Pyramid','Road','Restaurant','School','Stable','Tailor Shop','Temple',
+'Templo Mayor','Torch','Trading Post','Training Ground','Trebuchet','Windmill',
+'Wooden Gate','Wooden Stakes','Wooden Wall'}for aU,aV in pairs(aS)do aV.
+Buildings=aT end end)if aQ then a:Notify({Title='Buildings Unlocked',Content=
+'All buildings are now available for any class!',Type='Success',Duration=3})
+debugLog('Unlock All Buildings: Patched successfully')local aS=Instance.new(
+'ScreenGui')aS.Name='UnlockBuildingsPageToggle'aS.ResetOnSpawn=false aS.
+ZIndexBehavior=Enum.ZIndexBehavior.Sibling local aT=true local aU={'Arena',
+'Artisan','Barn','Bronze Statue','Cannon','Cemetary','Colosseum','Dock','Farm',
+'Forge','Garden','Great Wall of China','Hospital','House','Justice Court',
+'Library','Lighthouse of Alexandria','Military Camp','Mott','Notre-Dame',
+'Prison','Pyramid','Road','Restaurant','School'}local aV={'Stable','Tailor Shop'
+,'Temple','Templo Mayor','Torch','Trading Post','Training Ground','Trebuchet',
+'Windmill','Wooden Gate','Wooden Stakes','Wooden Wall'}local aW=Instance.new(
+'TextButton')aW.Name='PageToggleBtn'aW.Size=UDim2.new(0,80,0,24)aW.Position=
+UDim2.new(0.0118265441,0,0.70636034,-8)aW.BackgroundColor3=Color3.fromRGB(45,45,
+45)aW.Text='Page 1/2'aW.TextColor3=Color3.fromRGB(255,255,255)aW.Font=Enum.Font.
+GothamBold aW.TextSize=12 aW.Parent=aS local R=Instance.new('UICorner')R.
+CornerRadius=UDim.new(0,4)R.Parent=aW local S=Instance.new('UIStroke')S.Color=
+Color3.fromRGB(100,255,100)S.Thickness=1 S.Parent=aW aW.MouseButton1Click:
+Connect(function()aT=not aT local T=game:GetService('ReplicatedStorage')local U=
+(require::any)(T:WaitForChild('Class_Module'))local W=aT and aU or aV for X,Y in
+pairs(U)do Y.Buildings=W end aW.Text=aT and'Page 1/2'or'Page 2/2'aW.
+BackgroundColor3=aT and Color3.fromRGB(45,45,45)or Color3.fromRGB(65,45,45)end)
+local T=pcall(function()aS.Parent=aa end)if not T then aS.Parent=ah:
+WaitForChild('PlayerGui')end else a:Notify({Title='Unlock Failed',Content=
+'Error: '..tostring(aR),Type='Error',Duration=5})warn(
+'[AF-v25] Unlock All Buildings failed: '..tostring(aR))end else local aQ=aa:
+FindFirstChild('UnlockBuildingsPageToggle')if aQ then aQ:Destroy()end local aR=
+ah:FindFirstChild('PlayerGui')if aR then local aS=aR:FindFirstChild(
+'UnlockBuildingsPageToggle')if aS then aS:Destroy()end end end end,Cleanup=
+function()local aP=aa:FindFirstChild('UnlockBuildingsPageToggle')if aP then aP:
+Destroy()end local aQ=ah:FindFirstChild('PlayerGui')if aQ then local aR=aQ:
+FindFirstChild('UnlockBuildingsPageToggle')if aR then aR:Destroy()end end end})
+aj:Define('MainGuiButton',{Category='Misc',Type='Toggle',Name='Main GUI Button',
+Description='Adds a button to open/close the MainGui',Default=false,Callback=
+function(aP)if aP then local aQ=Instance.new('ScreenGui')aQ.Name=
+'MainGuiButtonGui'aQ.ResetOnSpawn=false aQ.ZIndexBehavior=Enum.ZIndexBehavior.
+Sibling local aR=ah:FindFirstChild('PlayerGui')local aS=aR and aR:
+FindFirstChild('MainGui_Injected')local aT=aS~=nil local aU=aS local aV=nil
+local aW=Instance.new('TextButton')aW.Name='MainGuiBtn'aW.Size=UDim2.new(0,100,0
+,24)aW.Position=UDim2.new(0.0118265441,0,0.70636034,-40)aW.BackgroundColor3=aT
+and Color3.fromRGB(65,45,45)or Color3.fromRGB(45,45,45)aW.Text=aT and
+'Close MainGUI'or'Open MainGUI'aW.TextColor3=Color3.fromRGB(255,255,255)aW.Font=
+Enum.Font.GothamBold aW.TextSize=12 aW.Parent=aQ local R=Instance.new('UICorner'
+)R.CornerRadius=UDim.new(0,4)R.Parent=aW local S=Instance.new('UIStroke')S.Color
+=Color3.fromRGB(100,255,100)S.Thickness=1 S.Parent=aW local function findMainGui
+(T)if not T then return nil end return T:FindFirstChild('MainGui_Injected')or T:
+FindFirstChild('MainGui')end task.spawn(function()while aQ and aQ.Parent do
+local T=ah:FindFirstChild('PlayerGui')local U=findMainGui(T)local W=U~=nil if W
+~=aT then aT=W aU=U if aT then aW.Text='Close MainGUI'aW.BackgroundColor3=Color3
+.fromRGB(65,45,45)else aW.Text='Open MainGUI'aW.BackgroundColor3=Color3.fromRGB(
+45,45,45)end end task.wait(1)end end)aW.MouseButton1Click:Connect(function()
+local T=ah:FindFirstChild('PlayerGui')local U=findMainGui(T)aT=U~=nil aU=U aT=
+not aT if aT then local W=game:GetService('ReplicatedStorage')local X=W:
+FindFirstChild('GUI')if X then local Y=X:FindFirstChild('MainGui')if Y then if T
+then local Z=T:FindFirstChild('MainGui_Injected')if Z then Z:Destroy()end local
+_=T:FindFirstChild('MainGui')if _ then _:Destroy()end end aU=Y:Clone()aU.Name=
+'MainGui_Injected'aU.Parent=ah:WaitForChild('PlayerGui')aW.Text='Close MainGUI'
+aW.BackgroundColor3=Color3.fromRGB(65,45,45)else warn(
+'[AF-v25] MainGui not found in ReplicatedStorage.GUI')aT=false end else warn(
+'[AF-v25] GUI folder not found in ReplicatedStorage')aT=false end else if T then
+local W=T:FindFirstChild('MainGui_Injected')if W then W:Destroy()end local X=T:
+FindFirstChild('MainGui')if X then X:Destroy()end end aU=nil aW.Text=
+'Open MainGUI'aW.BackgroundColor3=Color3.fromRGB(45,45,45)end end)local T=pcall(
+function()aQ.Parent=aa end)if not T then aQ.Parent=ah:WaitForChild('PlayerGui')
+end else local aQ=aa:FindFirstChild('MainGuiButtonGui')if aQ then aQ:Destroy()
+end local aR=ah:FindFirstChild('PlayerGui')if aR then local aS=aR:
+FindFirstChild('MainGuiButtonGui')if aS then aS:Destroy()end local aT=aR:
+FindFirstChild('MainGui_Injected')if aT then aT:Destroy()end end end end,Cleanup
+=function()local aP=aa:FindFirstChild('MainGuiButtonGui')if aP then aP:Destroy()
+end local aQ=ah:FindFirstChild('PlayerGui')if aQ then local aR=aQ:
+FindFirstChild('MainGuiButtonGui')if aR then aR:Destroy()end local aS=aQ:
+FindFirstChild('MainGui_Injected')if aS then aS:Destroy()end end end})aj:Define(
+'MainMenuButton',{Category='Misc',Type='Toggle',Name='Main Menu Button',
+Description='Adds a button to open/close the Main_Menu GUI',Default=false,
+Callback=function(aP)if aP then local aQ=Instance.new('ScreenGui')aQ.Name=
+'MainMenuButtonGui'aQ.ResetOnSpawn=false aQ.ZIndexBehavior=Enum.ZIndexBehavior.
+Sibling local aR=ah:FindFirstChild('PlayerGui')local aS=aR and aR:
+FindFirstChild('MainMenu_Injected')local aT=aS~=nil local aU=aS local aV=
+Instance.new('TextButton')aV.Name='MainMenuBtn'aV.Size=UDim2.new(0,100,0,24)aV.
+Position=UDim2.new(0.0118265441,0,0.70636034,-72)aV.BackgroundColor3=aT and
+Color3.fromRGB(65,45,45)or Color3.fromRGB(45,45,45)aV.Text=aT and
+'Close MainMenu'or'Open MainMenu'aV.TextColor3=Color3.fromRGB(255,255,255)aV.
+Font=Enum.Font.GothamBold aV.TextSize=12 aV.Parent=aQ local aW=Instance.new(
+'UICorner')aW.CornerRadius=UDim.new(0,4)aW.Parent=aV local R=Instance.new(
+'UIStroke')R.Color=Color3.fromRGB(100,255,100)R.Thickness=1 R.Parent=aV
+local function findMainMenu(S)if not S then return nil end return S:
+FindFirstChild('MainMenu_Injected')or S:FindFirstChild('Main_Menu')end task.
+spawn(function()while aQ and aQ.Parent do local S=ah:FindFirstChild('PlayerGui')
+local T=findMainMenu(S)local U=T~=nil if U~=aT then aT=U aU=T if aT then aV.Text
+='Close MainMenu'aV.BackgroundColor3=Color3.fromRGB(65,45,45)else aV.Text=
+'Open MainMenu'aV.BackgroundColor3=Color3.fromRGB(45,45,45)end end task.wait(1)
+end end)aV.MouseButton1Click:Connect(function()local S=ah:FindFirstChild(
+'PlayerGui')local T=findMainMenu(S)aT=T~=nil aU=T aT=not aT if aT then local U=
+game:GetService('ReplicatedStorage')local W=U:FindFirstChild('GUI')if W then
+local X=W:FindFirstChild('Main_Menu')if X then if S then local Y=S:
+FindFirstChild('MainMenu_Injected')if Y then Y:Destroy()end local Z=S:
+FindFirstChild('Main_Menu')if Z then Z:Destroy()end end aU=X:Clone()aU.Name=
+'MainMenu_Injected'aU.Parent=ah:WaitForChild('PlayerGui')aV.Text=
+'Close MainMenu'aV.BackgroundColor3=Color3.fromRGB(65,45,45)else warn(
+'[AF-v25] Main_Menu not found in ReplicatedStorage.GUI')aT=false end else warn(
+'[AF-v25] GUI folder not found in ReplicatedStorage')aT=false end else if S then
+local U=S:FindFirstChild('MainMenu_Injected')if U then U:Destroy()end local W=S:
+FindFirstChild('Main_Menu')if W then W:Destroy()end end aU=nil aV.Text=
+'Open MainMenu'aV.BackgroundColor3=Color3.fromRGB(45,45,45)end end)local S=
+pcall(function()aQ.Parent=aa end)if not S then aQ.Parent=ah:WaitForChild(
+'PlayerGui')end else local aQ=aa:FindFirstChild('MainMenuButtonGui')if aQ then
+aQ:Destroy()end local aR=ah:FindFirstChild('PlayerGui')if aR then local aS=aR:
+FindFirstChild('MainMenuButtonGui')if aS then aS:Destroy()end local aT=aR:
+FindFirstChild('MainMenu_Injected')if aT then aT:Destroy()end end end end,
+Cleanup=function()local aP=aa:FindFirstChild('MainMenuButtonGui')if aP then aP:
+Destroy()end local aQ=ah:FindFirstChild('PlayerGui')if aQ then local aR=aQ:
+FindFirstChild('MainMenuButtonGui')if aR then aR:Destroy()end local aS=aQ:
+FindFirstChild('MainMenu_Injected')if aS then aS:Destroy()end end end})aj:
+Define('AutoStorageTransferEnabled',{Category='Storage',Type='Toggle',Name=
+'Auto Transfer',Description=
+[[Automatically transfer items from inventory to house storage]],Default=false,
+Callback=function(aP)am.AutoStorageTransferEnabled=aP end,Cleanup=function()am.
+AutoStorageTransferEnabled=false end})aj:Define('AutoStorageTakeEnabled',{
+Category='Storage',Type='Toggle',Name='Auto Take',Description=
+'Automatically take items from house storage to inventory',Default=false,
+Callback=function(aP)am.AutoStorageTakeEnabled=aP end,Cleanup=function()am.
+AutoStorageTakeEnabled=false end})aj:Define('AutoStorageInterval',{Category=
+'Storage',Type='Slider',Name='Storage Interval (sec)',Default=5,Min=1,Max=60,
+Callback=function(aP)am.AutoStorageInterval=aP end,Cleanup=function()end})aj:
+Define('AutoStorageHouseId',{Category='Storage',Type='TextBox',Name=
+'House ID (digits only)',Placeholder='e.g., 34750',Default='',Callback=function(
+aP)am.AutoStorageHouseId=string.gsub(aP,'%D','')end,Cleanup=function()end})aj:
+Define('AutoStorageTP',{Category='Storage',Type='Toggle',Name=
+'Auto-Teleport to House',Description=
+[[Teleports to the house to ensure storage loads (Transfer/Take).]],Default=
+false,Callback=function(aP)am.AutoStorageTP=aP end,Cleanup=function()am.
+AutoStorageTP=false end})aj:Define('AutoPlant',{Category='Auto Plant',Type=
+'Toggle',Name='Enable Auto-Plant',Description=
+'Automatically plants crops on empty plots you own',Default=false,Callback=
+function(aP)am.AutoPlant=aP if aP and not aB and ah.Character and ah.Character:
+FindFirstChild('HumanoidRootPart')then aB=ah.Character.HumanoidRootPart.CFrame
+debugLog('StartCFrame captured (Auto-Plant)')end scanForTargets()end,Cleanup=
+function()am.AutoPlant=false end})local function getCropOptionsForEthnicity(aP)
+local aQ={}for aR,aS in pairs(ap)do for aT,aU in ipairs(aS.Ethnicity)do if aU==
+aP then table.insert(aQ,aS)break end end end table.sort(aQ,function(aR,aS)if aR.
+Level~=aS.Level then return aR.Level<aS.Level end return aR.Name<aS.Name end)
+local aR={}for aS,aT in ipairs(aQ)do table.insert(aR,aT.Name..' (Lvl '..aT.Level
+..')')end return aR,aQ end for aP,aQ in ipairs(at)do local aR='AutoPlant_'..
+string.gsub(aQ,' ','_')local aS,aT=getCropOptionsForEthnicity(aQ)local aU=aS[1]
+aj:Define(aR,{Category='Auto Plant',Type='Dropdown',Name=aQ..' Crop',Options=aS,
+Default=aU,Callback=function(aV)local aW=string.match(aV,'^(.+) %(Lvl')if aW
+then au[aQ]=aW else au[aQ]=aV end end,Cleanup=function()end})end aj:Define(
+'ScanMarkets',{Category='Market',Type='Toggle',Name='Enable Market Scanner',
+Default=false,Callback=function(aP)if aP then scanMarkets()else g={}end end,
+Cleanup=function()g={}end})aj:Define('MarketScanInterval',{Category='Market',
+Type='Slider',Name='Market Scan Interval (s)',Default=5,Min=0.5,Max=10,Callback=
+function(aP)end,Cleanup=function()end})aj:Define('MarketMaxItems',{Category=
+'Market',Type='Slider',Name='Max Displayed Items',Default=80,Min=20,Max=300,
+Callback=function(aP)end})aj:Define('MarketSortMode',{Category='Market',Type=
+'Dropdown',Name='Sort By',Options={'Name','Price','Distance'},Default='Name',
+Callback=function(aP)end})aj:Define('MarketSearch',{Category='Market',Type=
+'TextBox',Name='Search Item Name',Placeholder='Search...',Default='',Callback=
+function(aP)end})aj:Define('ShopsAutostockEnabled',{Category='Shops',Type=
+'Toggle',Name='Auto-Restock Shops',Default=false,Callback=function(aP)am.
+ShopsAutostockEnabled=aP if aP then a:Notify({Title='Auto-Restock Enabled',
+Content='Your shops will be restocked automatically',Type='Success',Duration=2})
+end end})aj:Define('ShopsAutostockInterval',{Category='Shops',Type='Slider',Name
+='Restock Interval (sec)',Min=5,Max=60,Default=10,Callback=function(aP)end})aj:
+Define('ShopsScanEnabled',{Category='Shops',Type='Toggle',Name='Scan for Stores'
+,Default=true,Callback=function(aP)am.ShopsScanEnabled=aP if aP then a:Notify({
+Title='Store Scanning Enabled',Content='Will scan for your player-owned stores',
+Type='Info',Duration=2})end end})aj:Define('ShopsScanInterval',{Category='Shops'
+,Type='Slider',Name='Scan Interval (sec)',Min=1,Max=30,Default=5,Callback=
+function(aP)end})aj:Define('TP_BuildingType',{Category='TP',Type='Dropdown',Name
+='Building Type',Options=av,Default='Artisan',Callback=function(aP)end,Cleanup=
+function()end})aj:Define('TP_OwnerFilter',{Category='TP',Type='Dropdown',Name=
+'Owner Filter',Options={'Any','None','Self'},Default='Any',Callback=function(aP)
+end,Cleanup=function()end})aj:Define('TP_PrioritizeTier',{Category='TP',Type=
+'Toggle',Name='Prioritize Highest Tier',Default=true,Callback=function(aP)end,
+Cleanup=function()end})aj:Define('PrioritizationEnabled',{Category=
+'Prioritization',Type='Toggle',Name='Enable Prioritization',Description=
+[[Ratio-based resource mining. Priorities are relative to 1. Priority 0 = never mine.]]
+,Default=false,Callback=function(aP)m=aP if aP then updateAllInventoryCounts()
+end end,Cleanup=function()m=false end})for aP,aQ in ipairs(ak)do aj:Define(
+'Priority_'..aQ,{Category='Prioritization',Type='Slider',Name=aQ..' Priority',
+Default=1,Min=0,Max=10,Callback=function(aR)n[aQ]=aR end,Cleanup=function()n[aQ]
+=1 end})end aj:Define('PriorityThreshold',{Category='Prioritization',Type=
+'Slider',Name='Priority Threshold',Description=
+[[Only switch to further nodes if effective inventory difference exceeds this. Set to 0 for old behavior (always highest need).]]
+,Default=25,Min=0,Max=200,Callback=function(aP)am.PriorityThreshold=aP end,
+Cleanup=function()am.PriorityThreshold=25 end})aj:Define(
+'UseNodesMinedForPriority',{Category='Prioritization',Type='Toggle',Name=
+'Use Nodes Mined for Priority',Description=
+[[Use nodes mined count instead of inventory count for prioritization calculations. Resets each session.]]
+,Default=false,Callback=function(aP)q=aP end,Cleanup=function()q=false end})aj:
+Define('PlayerESPEnabled',{Category='Player ESP',Type='Toggle',Name=
+'Enable Player ESP',Description=
+[[Show BillboardGui above each player with stats, team, inventory]],Default=
+false,Callback=function(aP)t=aP if not aP then for aQ,aR in pairs(u)do if aR and
+aR.Parent then aR:Destroy()end end u={}for aQ,aR in pairs(v)do if aR and aR.
+Parent then aR:Destroy()end end v={}end end,Cleanup=function()t=false end})aj:
+Define('PlayerESPDistance',{Category='Player ESP',Type='Slider',Name=
+'ESP Distance',Description='Max distance to show player ESP (studs)',Default=
+1000,Min=100,Max=5000,Callback=function(aP)w=aP end,Cleanup=function()end})aj:
+Define('PlayerESPTransparency',{Category='Player ESP',Type='Slider',Name=
+'Highlight Transparency',Description=
+[[Fill transparency for player highlights (0 = opaque, 1 = invisible)]],Default=
+0.3,Min=0,Max=1,Callback=function(aP)x=aP end,Cleanup=function()end})aj:Define(
+'PlayerESPShowInventory',{Category='Player ESP',Type='Toggle',Name=
+'Show Inventory',Description=
+"Display player's inventory items in the ESP billboard",Default=true,Callback=
+function(aP)y=aP end,Cleanup=function()end})aj:Define('PlayerESPShowDistance',{
+Category='Player ESP',Type='Toggle',Name='Show Distance',Description=
+'Display distance to each player in the ESP billboard',Default=true,Callback=
+function(aP)z=aP end,Cleanup=function()end})aj:Define(
+'PlayerESPHighlightEnabled',{Category='Player ESP',Type='Toggle',Name=
+'Highlight Players',Description=
+[[Add colored Highlight instances on player characters (team-based colors)]],
+Default=true,Callback=function(aP)A=aP if not aP then for aQ,aR in pairs(v)do if
+aR and aR.Parent then aR:Destroy()end end v={}end end,Cleanup=function()end})aj:
+Define('PlayerESPShowSelf',{Category='Player ESP',Type='Toggle',Name=
+'Show Self ESP',Description=
+[[Include your own player in the ESP display (billboard + highlight)]],Default=
+false,Callback=function(aP)B=aP if not aP then removePlayerBillboard(ah)
+removePlayerHighlight(ah)end end,Cleanup=function()B=false end})aj:Define(
+'SuspiciousAlertEnabled',{Category='Alerts',Type='Toggle',Name=
+'Suspicious Resource Alert',Description=
+'Alert when any player has suspicious amounts of a resource',Default=false,
+Callback=function(aP)C=aP if not aP then F={}end end,Cleanup=function()C=false
+end})aj:Define('SuspiciousAlertThreshold',{Category='Alerts',Type='Slider',Name=
+'Alert Threshold',Description=
+'Trigger alert when any inventory item exceeds this count',Default=5000,Min=1,
+Max=20000,Callback=function(aP)D=aP end,Cleanup=function()end})aj:Define(
+'SuspiciousAlertInterval',{Category='Alerts',Type='Slider',Name=
+'Alert Scan Interval (s)',Description=
+'How often to scan players for suspicious resources',Default=5,Min=1,Max=60,
+Callback=function(aP)E=aP end,Cleanup=function()end})aj:Define(
+'AutoTakeAllHousesEnabled',{Category='Storage',Type='Toggle',Name=
+'Auto-Take All Houses',Description=
+[[Periodically take resources from ALL houses (not just yours)]],Default=false,
+Callback=function(aP)G=aP if aP then a:Notify({Title='All-House Looting Enabled'
+,Content='Will take from every house periodically',Type='Warning',Duration=4})
+end end,Cleanup=function()G=false end})aj:Define('AutoTakeAllHousesInterval',{
+Category='Storage',Type='Slider',Name='All Houses Interval (s)',Description=
+'How often to take from all houses',Default=15,Min=15,Max=120,Callback=function(
+aP)H=aP end,Cleanup=function()end})aj:Load()local aP=a:CreateWindow({Name=
+'Humankind3 Autofarm v25',Icon='\u{26cf}\u{fe0f}',Theme='Matrix',ToggleKey=Enum.
+KeyCode.RightShift})aj:BindToClose(aP)local aQ=aP:CreateTab('Farm',
+'\u{26cf}\u{fe0f}')aC=aQ:Panel('Controls')local aR=aQ:Panel('Settings')aj:
+Render(aC,'Main')aj:Render(aR,'Settings')aC:Button('Skip Current Target',
+function()if aI then blacklistTarget(aI.Model)aI=nil scanForTargets()manageESP()
+a:Notify({Title='Target Skipped',Content='Moving to next resource...',Type=
+'Warning',Duration=2})end end)local aS=aP:CreateTab('Misc','\u{1f6e0}\u{fe0f}')
+local aT=aS:Panel('Tools')aj:Render(aT,'Misc')local aU=aS:Panel(
+'Auto Take/Transfer')aU:Label(
+'Toggle auto-take and auto-transfer independently.')aU:Label(
+'House ID = digits only (e.g., 34750 for House34750)')aj:Render(aU,'Storage')aU:
+Button('Find Nearest House',function()local aV,aW=findNearestHouse()if aW then
+aj:Set('AutoStorageHouseId',aW)a:Notify({Title='House Found',Content=
+'Set to House'..aW,Type='Success',Duration=3})else a:Notify({Title=
+'No House Found',Content='No houses found in workspace.Buildings',Type='Warning'
+,Duration=4})end end)aU:Button('Teleport to Selected House',function()local aV=
+am.AutoStorageHouseId if aV==''then a:Notify({Title='No House Set',Content=
+'Set a House ID first',Type='Warning',Duration=3})return end local aW=
+getHouseModel(aV)if aW then local R=ah.Character and ah.Character:
+FindFirstChild('HumanoidRootPart')if R then local S=aW:GetPivot()safeTeleport(R,
+S+Vector3.new(0,5,0))a:Notify({Title='Teleported',Content='Warped to House'..aV,
+Type='Success',Duration=2})end else a:Notify({Title='House Not Found',Content=
+'House'..aV..' does not exist!',Type='Error',Duration=4})end end)aU:Button(
+'Transfer Now',function()local aV=am.AutoStorageHouseId if aV==''then a:Notify({
+Title='No House Set',Content='Set a House ID first',Type='Warning',Duration=3})
+return end local aW=executeStorageOperation(aV,'Transfer',false)if aW then a:
+Notify({Title='Transfer Complete',Content='Transferred items to House'..aV,Type=
+'Success',Duration=3})end end)aU:Button('Take Now',function()local aV=am.
+AutoStorageHouseId if aV==''then a:Notify({Title='No House Set',Content=
+'Set a House ID first',Type='Warning',Duration=3})return end local aW=
+executeStorageOperation(aV,'Take',false)if aW then a:Notify({Title=
+'Take Complete',Content='Took items from House'..aV,Type='Success',Duration=3})
+end end)aU:Button('Take From All Houses',function()local aV=game:GetService(
+'ReplicatedStorage'):FindFirstChild('Remotes')local aW=aV and aV:FindFirstChild(
+'Storage')if not aW then a:Notify({Title='Error',Content=
+'Storage remote not found!',Type='Error',Duration=4})return end local R=af:
+FindFirstChild('Buildings')if not R then return end local S=am.AutoStorageTP
+local T=nil local U=ah.Character and ah.Character:FindFirstChild(
+'HumanoidRootPart')if S and U then T=U.CFrame a:Notify({Title=
+'Starting Loot Run',Content=
+'Teleporting to all houses... this may take a while.',Type='Info',Duration=5})
+end local W=0 task.spawn(function()for X,Y in ipairs(R:GetChildren())do local Z=
+Y.Name:match('^House(%d+)$')if Z then local _=false if S and U then local aX=Y:
+GetPivot()safeTeleport(U,aX+Vector3.new(0,5,0))local aY=tick()while(tick()-aY)<2
+do if getHouseStorage(Z)then break end task.wait(0.1)end end local aX=
+getHouseStorage(Z)if aX then pcall(function()aW:FireServer('TakeAll',aX)end)W=W+
+1 _=true end if S then task.wait(0.2)else task.wait(0.05)end end end if S and T
+and U then safeTeleport(U,T)end a:Notify({Title='Mass Take Complete',Content=
+'Attempted to take from '..W..' houses',Type='Success',Duration=4})end)end)local
+aV=aP:CreateTab('Planting','\u{1f331}')local aW=aV:Panel('Auto-Plant Settings')
+aW:Label('If preferred crop is above your level,')aW:Label(
+'the highest available crop will be used.')aj:Render(aW,'Auto Plant')local aX=aP
+:CreateTab('Priority','\u{2696}\u{fe0f}')local aY=aX:Panel('Priority Settings')
+aY:Label('Set priorities relative to 1. Priority 0 = never mine.')aY:Label(
+'Threshold=0: Always prioritize highest need (old behavior)')aY:Label(
+[[Threshold>0: Prefer nearest unless need difference exceeds threshold]])aj:
+Render(aY,'Prioritization')local R=aX:Panel('Inventory Counts')R:Label(
+'Live counts (updates every second):')R:Label('Format: Inventory / Nodes Mined')
+for S,T in ipairs(ak)do local U=getInventoryCount(T)local W=p[T]or 0 local X=T
+if T=='Big Wood'then X=T..' (shares Wood)'end local Y=R:Label(X..': '..U..' / '
+..W)r[T]=Y end R:Button('Reset Nodes Mined',function()for S,T in ipairs(ak)do p[
+T]=0 end a:Notify({Title='Nodes Mined Reset',Content=
+'All node counts have been reset to 0',Type='Success',Duration=2})end)local S=aP
+:CreateTab('Markets','\u{1f4b0}')local T=S:Panel('Settings')local U=S:Panel(
+'Market Offers')aj:Render(T,'Market')local function renderMarketLegend()local W=
+''for X,Y in pairs(aN)do if X~='Resturant'and X~='Restuarant'then W=W..string.
+format("<font color='%s'>%s</font>  ",Y,X)end end U:Label(
+'Legend: [$] Buy, [G] Goto (Teleport)')U:Label(W)end task.spawn(function()local
+W=0 local X=0 local Y={}local Z=false while aD do local _=aP.ActiveTab==S and aj
+.Values['ScanMarkets']if _ then if not Z then U:Clear()renderMarketLegend()Y={}Z
+=true end local aZ=tick()local a_=aj.Values['MarketScanInterval']or 1 if(aZ-W)>=
+a_ then scanMarkets()W=aZ end if(aZ-X)>=math.min(a_,0.5)then if#g==0 then for a0
+,a1 in pairs(Y)do if a1.Row.Destroy then a1.Row:Destroy()end Y[a0]=nil end U:
+Label('No offers found.')else local a0={}local a1=aj.Values['MarketMaxItems']or
+80 local a2=string.lower(aj.Values['MarketSearch']or'')local a3=0 for a4,a5 in
+ipairs(g)do if a3>=a1 then break end if a2~=''and not string.find(string.lower(
+a5.Name),a2)then continue end a3=a3+1 local a6=a5.ItemValue a0[a6]=true local a7
+=(a5.BatchSize or 1)>1 and string.format('$%d / %d',a5.RawPrice,a5.BatchSize)or
+string.format('$%d',a5.RawPrice)local a8=aN[a5.Section]or'#FFFFFF'local a9=
+string.format("<font color='%s'>%s</font> (x%d) @ %s",a8,a5.Name,a5.Stock,a7)
+local ba=Y[a6]if not ba then local bb=U:MiniActionRow(a9,{{Text='G',Color=Color3
+.fromRGB(0,150,255),Callback=function()if a5.Stall then local bb,bc=a5.Stall:
+GetBoundingBox()local bd=ah.Character and ah.Character:FindFirstChild(
+'HumanoidRootPart')if bd then safeTeleport(bd,bb+Vector3.new(0,5,0))end end end}
+,{Text='$',Color=Color3.fromRGB(50,205,50),Callback=function()buyMarketItem(a5)
+end}})Y[a6]={Row=bb,LastPrice=a5.RawPrice,LastStock=a5.Stock}ba=Y[a6]else if ba.
+LastStock~=a5.Stock or ba.LastPrice~=a5.RawPrice then ba.Row:SetText(a9)ba.
+LastStock=a5.Stock ba.LastPrice=a5.RawPrice end end if ba.Row.SetLayoutOrder
+then ba.Row:SetLayoutOrder(a4)end end for a4,a5 in pairs(Y)do if not a0[a4]then
+if a5.Row.Destroy then a5.Row:Destroy()end Y[a4]=nil end end end X=aZ end elseif
+Z then for aZ,a_ in pairs(Y)do if a_.Row and a_.Row.Destroy then a_.Row:Destroy(
+)end end Y={}U:Clear()Z=false U:Label('Scanner disabled.')end task.wait(0.2)end
+end)local aZ=aP:CreateTab('Shops','\u{1f3ea}')local a_=aZ:Panel('Settings')local
+a0=aZ:Panel('Your Stores')aj:Render(a_,'Shops')local a1={NoStoresLabel=nil,
+StoreFrames={},LastRenderCount=-1}a_:Label(
+'Manage your player-owned stores. [G] in store header teleports to shop. Per-item: [A] toggle auto-restock, [\u{2212}][+] stock, [\u{25bc}][\u{25b2}] price. Slider sets target (1-200).'
+)a_:Button('Enable All Auto-Restock',function()for a2,a3 in pairs(i)do for a4,a5
+in pairs(a3)do a5.enabled=true end end for a2,a3 in pairs(h)do if not i[a2]then
+i[a2]={}end for a4,a5 in pairs(a3.Stock)do if not i[a2][a4]then i[a2][a4]={
+target=10,enabled=true}else i[a2][a4].enabled=true end end end for a2,a3 in
+pairs(a1.StoreFrames)do if a3 and a3.rows then for a4,a5 in pairs(a3.rows)do if
+a5.AutoButton then a5.AutoButton.BackgroundColor3=Color3.fromRGB(100,255,100)end
+end end end a:Notify({Title='Shops',Content='Enabled auto-restock for all items'
+,Type='Success',Duration=2})end)a_:Button('Disable All Auto-Restock',function()
+for a2,a3 in pairs(i)do for a4,a5 in pairs(a3)do a5.enabled=false end end for a2
+,a3 in pairs(a1.StoreFrames)do if a3 and a3.rows then for a4,a5 in pairs(a3.rows
+)do if a5.AutoButton then a5.AutoButton.BackgroundColor3=Color3.fromRGB(80,80,80
+)end end end end a:Notify({Title='Shops',Content=
+'Disabled auto-restock for all items',Type='Info',Duration=2})end)local function
+createShopItemRow(a2,a3,a4,a5,a6)local a7=getMarketRemote()if not i[a3]then i[a3
+]={}end if not i[a3][a4]then i[a3][a4]={target=10,enabled=false}end local a8=i[
+a3][a4]local a9=a5.Price or 0 local ba=a5.BatchSize or 1 local bb=a5.Stock or 0
+local bc=aN[a6]or'#FFFFFF'local bd=bb<=0 and"<font color='#666666'>"or''local W=
+bb<=0 and'</font>'or''local X=formatShopPrice(a9,ba)local Y=string.format(
+"%s<font color='%s'>%s</font> (x%d) @ %s%s",bd,bc,a4,bb,X,W)local Z=a2:Label(Y)
+local function refreshRowLabel()if not(Z and Z.Set)then return end local _=h[a3]
+if not _ or not _.Stock or not _.Stock[a4]then return end local be=_.Stock[a4]
+local bf=be.BatchSize or 1 local bg=be.Price or 0 local bh=be.Stock or 0 local
+bi=bh<=0 and"<font color='#666666'>"or''local bj=bh<=0 and'</font>'or''local bk=
+string.format("%s<font color='%s'>%s</font> (x%d) @ %s%s",bi,bc,a4,bh,
+formatShopPrice(bg,bf),bj)Z:Set(bk)end local be=a8.enabled and Color3.fromRGB(
+100,255,100)or Color3.fromRGB(80,80,80)local bf bf=a2:MiniActionRow('',{{Text=
+'A',Color=be,Callback=function()a8.enabled=not a8.enabled local bg for bh,bi in
+ipairs(bf.Inst:GetChildren())do if bi:IsA('Frame')then bg=bi break end end if bg
+then for bh,bi in ipairs(bg:GetChildren())do if bi:IsA('TextButton')and bi.Text
+=='A'then bi.BackgroundColor3=a8.enabled and Color3.fromRGB(100,255,100)or
+Color3.fromRGB(80,80,80)break end end end a:Notify({Title='Auto-Restock '..(a8.
+enabled and'On'or'Off'),Content=a4..' auto-restock '..(a8.enabled and'enabled'or
+'disabled'),Type=a8.enabled and'Success'or'Info',Duration=2})end},{Text=
+'\u{2212}',Color=Color3.fromRGB(255,100,100),Callback=function()if a7 then local
+bg=h[a3]if bg and bg.Stock and bg.Stock[a4]then bg.Stock[a4].Stock=math.max(0,bg
+.Stock[a4].Stock-1)refreshRowLabel()end a7:FireServer(a3,'BuyItem',a4)task.
+delay(0.15,function()reindexPlayerStore(a3)refreshRowLabel()end)end end},{Text=
+'+',Color=Color3.fromRGB(100,255,100),Callback=function()if a7 then local bg=
+getAnyInventoryCount(a4)if bg>0 then local bh=h[a3]if bh and bh.Stock and bh.
+Stock[a4]then bh.Stock[a4].Stock=bh.Stock[a4].Stock+1 refreshRowLabel()end a7:
+FireServer(a3,'AddItem',a4,'1')task.delay(0.15,function()reindexPlayerStore(a3)
+refreshRowLabel()end)else local bh=0 local bi=a8.target or 10 local bj=h[a3]if
+bj and bj.Stock and bj.Stock[a4]then bh=bj.Stock[a4].Stock or 0 end a:Notify({
+Title='Cannot Add Stock',Content=string.format(
+[[No %s in inventory (0 available). Store has %d, target is %d.]],a4,bh,bi),Type
+='Error',Duration=10,Urgent=true})end end end},{Text='\u{25bc}',Color=Color3.
+fromRGB(255,200,100),Callback=function()if a7 then local bg=h[a3]if bg and bg.
+Stock and bg.Stock[a4]then bg.Stock[a4].Price=math.max(0,bg.Stock[a4].Price-1)
+refreshRowLabel()end a7:FireServer(a3,'PriceDown',a4)task.delay(0.15,function()
+reindexPlayerStore(a3)refreshRowLabel()end)end end},{Text='\u{25b2}',Color=
+Color3.fromRGB(100,200,255),Callback=function()if a7 then local bg=h[a3]if bg
+and bg.Stock and bg.Stock[a4]then bg.Stock[a4].Price=bg.Stock[a4].Price+1
+refreshRowLabel()end a7:FireServer(a3,'PriceUp',a4)task.delay(0.15,function()
+reindexPlayerStore(a3)refreshRowLabel()end)end end}})local bg=nil local bh for
+bi,bj in ipairs(bf.Inst:GetChildren())do if bj:IsA('Frame')then bh=bj break end
+end if bh then for bi,bj in ipairs(bh:GetChildren())do if bj:IsA('TextButton')
+and bj.Text=='A'then bg=bj break end end end a8.target=math.floor(a8.target)
+local bi=a2:Slider('Target',1,200,a8.target,'',function(bi)a8.target=math.floor(
+bi)end)return{Row=Z,ButtonRow=bf,SliderRow=bi,AutoButton=bg,ItemName=a4,
+LastStock=bb,LastPrice=a9,BatchSize=ba,ItemSettings=a8,RefreshLabel=
+refreshRowLabel}end local function createEmptyItemRow(a2,a3)local a4=a2:Label(
+'No item')local a5=Color3.fromRGB(50,50,50)local function noItemCallback()a:
+Notify({Title='Empty Slot',Content='No item in this slot',Type='Info',Duration=1
+})end local a6=a2:MiniActionRow('',{{Text='A',Color=a5,Callback=noItemCallback},
+{Text='\u{2212}',Color=a5,Callback=noItemCallback},{Text='+',Color=a5,Callback=
+noItemCallback},{Text='\u{25bc}',Color=a5,Callback=noItemCallback},{Text=
+'\u{25b2}',Color=a5,Callback=noItemCallback}})local a7=a2:Slider('Target',1,200,
+10,'',function(a7)end)return{Row=a4,ButtonRow=a6,SliderRow=a7,AutoButton=nil,
+ItemName=nil,LastStock=0,LastPrice=0,BatchSize=1}end task.spawn(function()local
+a2=0 local a3=30 while aD do local a4=aj.Values['ShopsAutostockInterval']or 10
+task.wait(a4)if not am.ShopsAutostockEnabled then continue end local a5=
+getMarketRemote()if not a5 then continue end local a6=tick()local a7=false for
+a8 in pairs(h)do a7=true break end if not a7 or(a6-a2)>a3 then scanPlayerStores(
+)a2=a6 end local a8={}for a9,ba in pairs(h)do local bb=i[a9]or{}
+reindexPlayerStore(a9)ba=h[a9]if not ba then continue end for bc,bd in pairs(ba.
+Stock)do local be=bb[bc]if not be or not be.enabled then continue end local bf=
+be.target or 10 local bg=bd.Stock local bh=bf-bg if bh>0 then local bi=
+getAnyInventoryCount(bc)if bi>=bh then a5:FireServer(a9,'AddItem',bc,tostring(bh
+))task.wait(0.15)elseif bi>0 then a5:FireServer(a9,'AddItem',bc,tostring(bi))
+task.wait(0.15)table.insert(a8,{store=ba.Name,item=bc,needed=bh-bi,current=bg+bi
+,target=bf,inventory=0,partial=true,added=bi})else table.insert(a8,{store=ba.
+Name,item=bc,needed=bh,current=bg,target=bf,inventory=0,partial=false,added=0})
+end end end reindexPlayerStore(a9)end if#a8>0 then local a9=tick()local ba={}for
+bb,bc in ipairs(a8)do local bd=bc.store..':'..bc.item if not j[bd]or(a9-j[bd])>3
+then if bc.partial then table.insert(ba,string.format(
+'%s: %s (added %d, still need %d more, inv: 0)',bc.store,bc.item,bc.added,bc.
+needed))else table.insert(ba,string.format(
+'%s: %s (have %d/%d, need %d, inv: 0)',bc.store,bc.item,bc.current,bc.target,bc.
+needed))end j[bd]=a9 end end if#ba>0 then a:Notify({Title=
+'Cannot Restock - Low Inventory',Content=table.concat(ba,'\n'),Type='Error',
+Duration=12,Urgent=true})end end end end)task.spawn(function()local a2=true
+local a3=0 local a4=30 while aD do if aP.ActiveTab~=aZ then task.wait(1)continue
+end if not am.ShopsScanEnabled and not a2 then task.wait(1)continue end local a5
+=tick()local a6=false for a7 in pairs(h)do a6=true break end if not a6 or a2 or(
+a5-a3)>a4 then scanPlayerStores()a3=a5 else for a7 in pairs(h)do
+reindexPlayerStore(a7)end end a2=false local a7=0 for a8 in pairs(h)do a7=a7+1
+end if a7==0 then if not a1.NoStoresLabel then a0:Clear()a1.NoStoresLabel=a0:
+Label(
+[[You don't own any stores. Build or claim a Small Store, Trading Post, Forge, Artisan, Restaurant, or Tailor Shop to manage it here.]]
+)a1.StoreFrames={}end a1.LastRenderCount=0 local a8=aj.Values[
+'ShopsScanInterval']or 5 task.wait(a8)continue end if a1.NoStoresLabel and a7>0
+then a1.NoStoresLabel=nil end if a7~=a1.LastRenderCount then local a8=aZ.Scroll.
+CanvasPosition a0:Clear()a1.StoreFrames={}a1.NoStoresLabel=nil a0:Label(
+'Legend: [G] Goto | [A] Auto | [\u{2212}][+] Stock | [\u{25bc}][\u{25b2}] Price'
+)a0:Label(
+[[<font color='#FFFFFF'>Small Store</font> | <font color='#FF8C00'>Forge</font> | <font color='#FFD700'>Artisan</font> | <font color='#00FF00'>Restaurant</font> | <font color='#FF69B4'>Tailor</font> | <font color='#00BFFF'>Trading Post</font>]]
+)local a9=0 for ba,bb in pairs(h)do a9=a9+1 local bc=0 for bd in pairs(bb.Stock)
+do bc=bc+1 end local bd=aN[bb.Type]or'#FFFFFF'local be=string.format(
+"<font color='%s'><b>%s</b></font> (%d/6 items)",bd,bb.Name,bc)local bf=a0:
+MiniActionRow(be,{{Text='G',Color=Color3.fromRGB(100,180,255),Callback=function(
+)local bf=ah.Character and ah.Character:FindFirstChild('HumanoidRootPart')if bf
+and ba and ba:IsA('Model')then local bg=ba:GetPivot()safeTeleport(bf,bg+Vector3.
+new(0,5,0))end end}})l[ba]=l[ba]or 10 local bg=a0:Slider('Set All Targets',1,200
+,l[ba],'',function(bg)l[ba]=math.floor(bg)end)a0:Button('Apply to All',function(
+)local bh=math.floor(l[ba]or 10)if not i[ba]then i[ba]={}end local bi=h[ba]local
+bj=bi and bi.Stock or{}local bk=0 for W,X in pairs(bj)do if not i[ba][W]then i[
+ba][W]={target=bh,enabled=false}else i[ba][W].target=bh end bk=bk+1 end if a1.
+StoreFrames[ba]and a1.StoreFrames[ba].rows then for W,X in pairs(a1.StoreFrames[
+ba].rows)do if X.SliderRow and X.SliderRow.Set then X.SliderRow:Set(bh)end end
+end a:Notify({Title='Targets Updated',Content='Set '..bk..' item targets to '..
+bh,Type='Success',Duration=2})end)local bh={}local bi=0 for bj,bk in pairs(bb.
+Stock)do bi=bi+1 if bi<=8 then bh[bj]=createShopItemRow(a0,ba,bj,bk,bb.Type)end
+end for bj=bi+1,8 do bh['__empty_'..bj]=createEmptyItemRow(a0,bj)end a1.
+StoreFrames[ba]={rows=bh,header=bf,storeType=bb.Type}if a9<a7 then a0:Label(
+'\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}'
+)end end a1.LastRenderCount=a7 task.defer(function()if aZ and aZ.Scroll then aZ.
+Scroll.CanvasPosition=a8 end end)else for a8,a9 in pairs(h)do local ba=a1.
+StoreFrames[a8]if ba and ba.rows then local bb=aN[ba.storeType]or'#FFFFFF'local
+bc=0 for bd in pairs(a9.Stock)do bc=bc+1 end if ba.header and ba.header.SetText
+then local bd=string.format("<font color='%s'><b>%s</b></font> (%d/6 items)",bb,
+a9.Name,bc)ba.header:SetText(bd)end for bd,be in pairs(a9.Stock)do local bf=ba.
+rows[bd]if bf and bf.Row then if bf.LastStock~=be.Stock or bf.LastPrice~=be.
+Price then local bg=be.Stock or 0 local bh=bg<=0 and"<font color='#666666'>"or''
+local bi=bg<=0 and'</font>'or''local bj=be.BatchSize or 1 local bk=be.Price or 0
+local W=string.format("%s<font color='%s'>%s</font> (x%d) @ %s%s",bh,bb,bd,bg,
+formatShopPrice(bk,bj),bi)if bf.Row.Set then bf.Row:Set(W)end bf.LastStock=be.
+Stock bf.LastPrice=be.Price bf.BatchSize=bj end else a1.LastRenderCount=-1 break
+end end for bd,be in pairs(ba.rows)do if be.ItemName and not a9.Stock[bd]then a1
+.LastRenderCount=-1 break end end end end end local a8=aj.Values[
+'ShopsScanInterval']or 5 task.wait(a8)end end)local a2=aS:Panel(
+'Teleport to Nearest')a2:Label(
+'Counts shown as (Total: n, Tier n: count, n: count)')aj:Render(a2,'TP')
+local function getBuildingCandidates(a3,a4)local a5=af:FindFirstChild(
+'Buildings')if not a5 then return{}end local a6={}for a7,a8 in ipairs(a5:
+GetChildren())do if a8:IsA('Model')and string.find(a8.Name,'^'..a3)then local a9
+=a8:GetAttribute('Owner')or''local ba=false if a4=='Any'then ba=true elseif a4==
+'None'then if a9==''then ba=true end elseif a4=='Self'then if a9==ah.Name then
+ba=true end end if ba then table.insert(a6,a8)end end end return a6 end a2:
+Button('Teleport',function()local a3=aj.Values['TP_BuildingType']local a4=aj.
+Values['TP_OwnerFilter']or'Any'local a5=aj.Values['TP_PrioritizeTier']if not a3
+then a:Notify({Title='Error',Content='No building type selected!',Type='Error'})
+return end local a6=getBuildingCandidates(a3,a4)if#a6==0 then a:Notify({Title=
+'No Buildings Found',Content='No '..a3..' matches filter '..a4,Type='Warning'})
+return end local a7=ah.Character and ah.Character:FindFirstChild(
+'HumanoidRootPart')if not a7 then return end local a8=a7.Position table.sort(a6,
+function(a9,ba)if a5 then local bb=a9:GetAttribute('Tier')or 0 local bc=ba:
+GetAttribute('Tier')or 0 if bb~=bc then return bb>bc end end local bb=a9:
+GetPivot().Position local bc=ba:GetPivot().Position return(bb-a8).Magnitude<(bc-
+a8).Magnitude end)local a9=a6[1]local ba,bb=a9:GetBoundingBox()safeTeleport(a7,
+ba+Vector3.new(0,bb.Y/2+3,0))a:Notify({Title='Teleported',Content=
+'Warped to nearest '..a9.Name,Type='Success',Duration=2})end)task.spawn(function
+()while aD do if aP.ActiveTab==aS then local a3=aj.Values['TP_OwnerFilter']or
+'Any'local a4={}for a5,a6 in ipairs(av)do local a7=0 local a8={}local a9=af:
+FindFirstChild('Buildings')if a9 then for ba,bb in ipairs(a9:GetChildren())do if
+bb:IsA('Model')and string.find(bb.Name,'^'..a6)then local bc=bb:GetAttribute(
+'Owner')or''local bd=false if a3=='Any'then bd=true elseif a3=='None'then if bc
+==''then bd=true end elseif a3=='Self'then if bc==ah.Name then bd=true end end
+if bd then a7=a7+1 local be=bb:GetAttribute('Tier')or 1 a8[be]=(a8[be]or 0)+1
+end end end end local ba=''local bb={}for bc,bd in pairs(a8)do table.insert(bb,
+bc)end table.sort(bb)if#bb==0 then ba=a6..' (0)'else ba=a6..' (Total: '..a7 for
+bc,bd in ipairs(bb)do local be=(bc==1 and', Tier 'or', ')ba=ba..be..bd..': '..a8
+[bd]end ba=ba..')'end table.insert(a4,{Label=ba,Value=a6})end local a5=aj.
+Definitions['TP_BuildingType']if a5 then a5.Options=a4 local a6=aj.UIElements[
+'TP_BuildingType']if a6 and a6.Refresh then local a7=aj.Values['TP_BuildingType'
+]a6:Refresh(a4,a7)end end end task.wait(am.ScanInterval)end end)task.spawn(
+function()while aD do if aE then local a3=af:FindFirstChild('Map')and af.Map:
+FindFirstChild('Killblock')if a3 then a3:ClearAllChildren()end end task.wait(1)
+end end)task.spawn(function()local a3=game:GetService('ReplicatedStorage'):
+WaitForChild('Remotes'):WaitForChild('Inventory')while aD do if am.AutoEat then
+local a4=af:FindFirstChild(ah.Name)local a5=a4 and a4:FindFirstChild('Stats')
+local a6=a5 and a5:FindFirstChild('Hunger')local a7=a5 and a5:FindFirstChild(
+'Inventory')if a6 and a7 then local a8=a6.Value local a9=100-a8 local ba=0 local
+bb=am.AutoEatMax or 1 for bc,bd in pairs(an)do if ba>=bb then break end local be
+=a7:FindFirstChild(bc)if be and be:IsA('IntValue')and be.Value>0 then if am.
+Debug then debugLog(string.format(
+'[Auto-Eat Debug] Hunger: %d | Space: %d | Food: %s (+%d)',a8,a9,bc,bd))end
+while ba<bb and a9>=bd and be.Value>0 do debugLog('Auto-Eating '..bc..
+' (Space: '..a9..' >= '..bd..')')a3:FireServer('Consume',bc)ba=ba+1 a9=a9-bd
+task.wait(0.3)end end end end end task.wait(1)end end)task.spawn(function()local
+a3=game:GetService('ReplicatedStorage'):WaitForChild('Remotes'):WaitForChild(
+'Inventory')while aD do if am.AutoHeal then local a4=af:FindFirstChild(ah.Name)
+local a5=a4 and a4:FindFirstChild('Stats')local a6=a5 and a5:FindFirstChild(
+'Health')local a7=a5 and a5:FindFirstChild('Inventory')if a6 and a7 then local
+a8=a6.Value local a9=100-a8 local ba=0 local bb=am.AutoHealMax or 4 for bc,bd in
+pairs(ao)do if ba>=bb then break end local be=a7:FindFirstChild(bc)if be and be:
+IsA('IntValue')and be.Value>0 then if am.Debug then debugLog(string.format(
+'[Auto-Heal Debug] Health: %d | Space: %d | Item: %s (+%d)',a8,a9,bc,bd))end
+while ba<bb and a9>=bd and be.Value>0 do debugLog('Auto-Healing with '..bc..
+' (Space: '..a9..' >= '..bd..')')a3:FireServer('Consume',bc)ba=ba+1 a9=a9-bd
+task.wait(0.3)end end end end end task.wait(1)end end)af.DescendantAdded:
+Connect(function(a3)if am.FarmWithoutFarmer and a3:IsA('ProximityPrompt')then
+task.wait(0.1)injectPlantPrompt(a3)end end)ac.PromptTriggered:Connect(function(
+a3,a4)if a4~=ah then return end if not am.FarmWithoutFarmer then return end if
+a3.ActionText~='PlantInjected'then return end local a5=a3.Parent if not a5 then
+return end if am.Debug then warn(string.format(
+'[AF-v25 Debug] Prompt: %s | Plot: %s (%s) | Farm: %s',a3.Name,a5.Name,a5.
+ClassName,a5.Parent and a5.Parent.Name or'N/A'))end local a6=a5.Parent if a6 and
+a6.Parent and a6.Parent.Name=='Buildings'and string.find(a6.Name,'Farm')then
+local a7=a5:GetAttribute('UniqueID')if a7 then createPlantingUI(a5,a6,a7)else if
+am.Debug then warn('[AF-v25 Debug] Plot '..a5.Name..
+" is missing 'UniqueID' attribute")end end end end)task.spawn(function()task.
+wait(1)while aD do if am.FarmWithoutFarmer then scanAndInjectPrompts()end task.
+wait(2)end end)task.spawn(function()while aD do safeCall('InventoryUpdateLoop',
+function()if m then updateAllInventoryCounts()for a3,a4 in pairs(r)do if a4 and
+a4.Set then local a5=o[a3]or 0 local a6=p[a3]or 0 local a7=a3 if a3=='Big Wood'
+then a7=a3..' (shares Wood)'end a4:Set(a7..': '..a5..' / '..a6)end end end end)
+task.wait(1)end end)local a3=aS:Panel('Open Interfaces')local a4={Artisan=6,Cook
+=6,Dock=1,Doctor=5,Forge=6,Furniture=5,Library=4,Tailor=6,Windmill=1}local a5={}
+for a6,a7 in pairs(a4)do table.insert(a5,a6)end table.sort(a5)local a6='Artisan'
+local a7=1 local a8 local function openCraftViewer(a9)local ba=ah.Character or
+ah.CharacterAdded:Wait()local bb=ba:WaitForChild('Stats')local bc=bb:
+WaitForChild('Inventory')local bd=game:GetService('ReplicatedStorage')local be=
+bd:WaitForChild('Craft')local bf=bd:WaitForChild('UI_Items')if ah.PlayerGui:
+FindFirstChild('Craft')then ah.PlayerGui.Craft:Destroy()end local bg=be:
+FindFirstChild(a9)if not bg then warn("[CraftViewer] Category '"..a9..
+"' not found in ReplicatedStorage.Craft")warn(
+'[CraftViewer] Available categories:')for bh,bi in pairs(be:GetChildren())do
+warn('  - '..bi.Name)end a:Notify({Title='Category Not Found',Content="'"..a9..
+"' not in ReplicatedStorage.Craft",Type='Error',Duration=5})return false end
+local bh=bd.GUI.Craft:Clone()bh.Parent=ah.PlayerGui bh.Frame.Close.
+MouseButton1Click:Connect(function()bh:Destroy()end)local function
+UpdateCraftInfo(bi,bj)if not bi or not bj then return end if bi:FindFirstChild(
+'UIStroke')and bi.UIStroke.Enabled==true then bi.UIStroke.Enabled=false bh.Frame
+.Informations.Visible=false return end bh.Frame.Informations.Visible=true bh.
+Frame.Selected.Value=bj.Name for bk,W in pairs(bh.Frame.ScrollingList:
+GetChildren())do if W:FindFirstChild('UIStroke')then if W.Name==bi.Name then W.
+UIStroke.Enabled=true else W.UIStroke.Enabled=false end end end bh.Frame.
+Informations.ItemSpot:ClearAllChildren()bh.Frame.Informations.ScrollingList:
+ClearAllChildren()if bf:FindFirstChild(bj.Name)then local bk=bf:FindFirstChild(
+bj.Name):Clone()bk.Parent=bh.Frame.Informations.ItemSpot bk.Size=UDim2.new(1,0,1
+,0)bk.Amount.Text=bj.Name end local bk=0 for W,X in pairs(bj:GetChildren())do if
+bf:FindFirstChild(X.Name)then local Y=bf:FindFirstChild(X.Name):Clone()Y.Parent=
+bh.Frame.Informations.ScrollingList Y.Size=UDim2.new(0.3,0,0.5,0)Y.Position=
+UDim2.new(bk*0.33,0,0,0)if bk+1==3 then end Y.Amount.Size=UDim2.new(1,0,1,0)
+local Z=0 if bc:FindFirstChild(X.Name)then Z=bc:FindFirstChild(X.Name).Value end
+Y.Amount.Text=X.Name..' '..Z..'/'..X.Value bk=bk+1 end end end local function
+UpdateCraftList()for bi,bj in pairs(bh.Frame.ScrollingList:GetChildren())do if
+not bj:IsA('UIGridLayout')and not bj:IsA('UIListLayout')and not bj:IsA(
+'UIPadding')and not bj:IsA('UIAspectRatioConstraint')then if bj:IsA('Frame')or
+bj:IsA('ImageButton')or bj:IsA('TextButton')or bj:IsA('ImageLabel')then bj:
+Destroy()end end end if not bh.Frame.ScrollingList:FindFirstChildOfClass(
+'UIGridLayout')then local bi=Instance.new('UIGridLayout')bi.CellSize=UDim2.new(
+0.3,0,0.3,0)bi.CellPadding=UDim2.new(0.02,0,0.02,0)bi.FillDirection=Enum.
+FillDirection.Horizontal bi.SortOrder=Enum.SortOrder.LayoutOrder bi.Parent=bh.
+Frame.ScrollingList end local bi=0 for bj=0,100 do for bk,W in pairs(bg:
+GetChildren())do if W:GetAttribute('Level')==bj then local X=true local Y=W:
+GetAttribute('Ethnicity')if Y~=nil and bb.Origins.Value~=Y then X=false end if X
+and bf:FindFirstChild(W.Name)then if bh.Frame.ScrollingList:FindFirstChild(W.
+Name)==nil then local bl,bm=pcall(function()local Z=bf:FindFirstChild(W.Name):
+Clone()Z.Parent=bh.Frame.ScrollingList Z.LayoutOrder=bi bi=bi+1 if bc:
+FindFirstChild(W.Name)then Z.Amount.Text='x '..bc:FindFirstChild(W.Name).Value
+end if W:GetAttribute('Level')<=bb.Level.Value then if Z:FindFirstChild('Craft')
+then Z.Craft.Visible=true end else if Z:FindFirstChild('Lock')then Z.Lock.
+Visible=true Z.Lock.Text='Lvl '..W:GetAttribute('Level')end end local _=W:
+GetAttribute('Tech')if _~=nil then local bl=ah:FindFirstChild('DataStore')and ah
+.DataStore:FindFirstChild('Upgrades')if bl then local bm=bl:FindFirstChild(_)if
+bm and bm.Value==false then if Z:FindFirstChild('Lock')then Z.Lock.Visible=true
+Z.Lock.Text='Requires '.._ end if Z:FindFirstChild('Craft')then Z.Craft.Visible=
+false end end end end local bl=Z:FindFirstChild('Lock')local bm=bl and bl.
+Visible if not bm then if Z:FindFirstChild('Craft')then Z.Craft.
+MouseButton1Click:Connect(function()bh.Frame.Selected.Value=W.Name end)end end
+end)if not bl then warn("[CraftViewer] Skipped '"..W.Name.."': "..tostring(bm))
+end else pcall(function()local bl=bh.Frame.ScrollingList:FindFirstChild(W.Name)
+if bc:FindFirstChild(W.Name)then bl.Amount.Text='x '..bc:FindFirstChild(W.Name).
+Value end if W:GetAttribute('Level')<=bb.Level.Value then if bl:FindFirstChild(
+'Craft')then bl.Craft.Visible=true end else if bl:FindFirstChild('Lock')then bl.
+Lock.Visible=true bl.Lock.Text='Lvl '..W:GetAttribute('Level')end end end)end
+end end end end pcall(function()bh.Frame.ScrollingList.CanvasSize=UDim2.new(0,0,
+0,0)bh.Frame.ScrollingList.AutomaticCanvasSize=Enum.AutomaticSize.Y end)end bh.
+Frame.Selected.Changed:Connect(function(bi)if bi==''then return end local bj=bh.
+Frame.ScrollingList:FindFirstChild(bi)local bk=bg:FindFirstChild(bi)
+UpdateCraftInfo(bj,bk)end)local bi=bh.Frame.Informations.Craft local bj=bi:
+FindFirstChild('Button')or bi bj.MouseButton1Click:Connect(function()local bk=bh
+.Frame.Selected.Value if bk==''or bk==nil then warn(
+'[CraftViewer] No item selected')return end local bl='1'local bm=bh.Frame.
+Informations:FindFirstChild('TextBox')if bm and bm.Text~=''then bl=bm.Text end
+local W=game:GetService('ReplicatedStorage'):FindFirstChild('Remotes')if W then
+local X=W:FindFirstChild('Craft')if X then X:FireServer(a9,bk,bl)end end task.
+wait(0.12)UpdateCraftList()end)UpdateCraftList()debugLog(
+'[CraftViewer] Opened craft menu for category: '..a9)return true end
+local function updateLevelOptions()if not a8 then return end local a9=a4[a6]or 1
+local ba={}for bb=a9,1,-1 do table.insert(ba,tostring(bb))end a8:Refresh(ba,
+tostring(a9))a7=a9 end a3:Dropdown('Category',a5,'Artisan',function(a9)a6=a9
+updateLevelOptions()end)a8=a3:Dropdown('Level',{'1','2','3','4','5'},'1',
+function(a9)a7=tonumber(a9)or 1 end)updateLevelOptions()local a9=false a3:
+Button('Open Interface',function()if a9 then return end a9=true task.delay(1,
+function()a9=false end)local ba=''if a6=='Windmill'then ba='Windmill1'elseif a4[
+a6]==1 then ba=a6..' 1'else ba=a6..' '..a7 end if am.Debug then debugLog(
+'Opening craft viewer with category: '..tostring(ba))end task.spawn(function()
+local bb=openCraftViewer(ba)if bb then a:Notify({Title='Interface Opened',
+Content='Viewing '..ba,Type='Success',Duration=2})end end)end)local ba=aS:Panel(
+'Civilizations')local bb=ba:Dropdown('Choose Civilization',{},'None',function()
+end)local bc=ba:Button({Name='Teleport',Callback=function()local bc=bb:Get()if
+not bc or bc==''or bc=='None'then a:Notify({Title='Error',Content=
+'No civilization selected!',Type='Error',Duration=2})return end local bd=bc:
+gsub(' %(Capital%)','')local be=af:FindFirstChild('Civilizations')local bf=be
+and be:FindFirstChild(bd)if bf then local bg=ah.Character and ah.Character:
+FindFirstChild('HumanoidRootPart')if bg then local bh,bi=bf:GetBoundingBox()
+safeTeleport(bg,bh+Vector3.new(0,bi.Y/2+3,0))a:Notify({Title='Teleported',
+Content='Warped to '..bd,Type='Success',Duration=2})end else a:Notify({Title=
+'Error',Content='Civilization not found!',Type='Error',Duration=2})end end})if
+bc and bc.Inst then bc.Inst.BackgroundColor3=Color3.fromRGB(0,200,100)bc.Inst.
+TextColor3=Color3.fromRGB(255,255,255)end task.spawn(function()while aD do if aP
+.ActiveTab==aS then local bd=af:FindFirstChild('Civilizations')if bd then local
+be={}for bf,bg in ipairs(bd:GetChildren())do if bg:IsA('Model')then local bh=bg.
+Name local bi=bg:FindFirstChild('Capture')if bi and bi:IsA('IntValue')and bi.
+Value==0 then bh=bh..' (Capital)'end table.insert(be,bh)end end table.sort(be)bb
+:Refresh(be,nil)end end task.wait(1)end end)local bd=aP:CreateTab('Players',
+'\u{1f465}')local be=bd:Panel('Player ESP Settings')aj:Render(be,'Player ESP')a:
+RegisterKeybind({Id='TogglePlayerESP',Key=Enum.KeyCode.E,Modifiers={Enum.KeyCode
+.LeftControl},Description='Toggle Player ESP',Callback=function()local bf=aj:
+Get('PlayerESPEnabled')aj:Set('PlayerESPEnabled',not bf)a:Notify({Title=
+'Player ESP',Content=(not bf)and'Enabled'or'Disabled',Type='Info',Duration=2})
+end})local bf=bd:Panel('Team Colors Legend')bf:Label(
+"<font color='#3CFF3C'>Friendly</font> - Your Team")bf:Label(
+"<font color='#FF3C3C'>Enemy</font> - Rival Team")bf:Label(
+"<font color='#C8C8C8'>Neutral</font> - Civilians/No Team")bf:Label(
+"<font color='#FFD700'>Gold</font> - Friendly King")bf:Label(
+"<font color='#C81E1E'>Crimson</font> - Enemy King")local bg=bd:Panel(
+'Suspicious Activity Alerts')bg:Label(
+'Alerts when players have high resource counts.')aj:Render(bg,'Alerts')local bh=
+aP:CreateTab('Info','\u{2139}\u{fe0f}')local bi=bh:Panel('About')bi:Label(
+'Humankind3 Autofarm v25')bi:Label('-------------------------')bi:Label(
+'Supports Wood, Ores, and Crops.')bi:CreateParagraph({Title='Crop Farming',
+Content=
+[[Any crops owned by the player will be available to be automatically harvested. The script detects 'Ready' status and ownership (including parent farms).]]
+})bi:Label("Select specific crops in 'Target Resources'.")bi:CreateParagraph({
+Title='Antigravity Autofarm v26',Content=
+[[A smart resource gathering script with trunk/ore core detection.]]})bi:
+CreateParagraph({Title='Panic Switch',Content=
+'Press BACKSPACE + EQUALS to instantly stop and cleanup.'})bi:Label(
+'Press RightShift to toggle UI visibility')local bj=aP:CreateTab('Status',
+'\u{1f4ca}')local bk=bj:Panel('Mining Status')local bl=bk:Label('Status: Idle')
+aJ=bj:Panel('Mining Progress'):ProgressBar('Current Target Limit',0)local bm=bk:
+Label('Target: None')local W=bk:Label('Timer: --')local X=bk:Label(
+'Total Resources: 0')local Y=bj:Panel('Resource Counts')local Z={}for _,bn in
+ipairs(ak)do Z[bn]=Y:Label(bn..': 0')end local bn=bj:Panel('Blacklist Manager')
+aK=bn task.spawn(function()while aD do if aP.ActiveTab==bj then
+refreshBlacklistUI()end task.wait(1)end end)task.spawn(function()while aD do
+safeCall('StatusUpdateLoop',function()if az then if aI then local _=tick()-aI.
+StartTime local bo=math.max(0,am.TimeoutSeconds-_)bl:Set('Status: Mining '..aI.
+Type)local bp='Unknown'if isValidInstance(aI.Instance)then bp=aI.Instance.Name
+end bm:Set('Target: '..bp)W:Set(string.format('Timer: %.1fs remaining',bo))else
+bl:Set('Status: Searching for targets...')bm:Set('Target: None')W:Set(
+'Timer: --')end else bl:Set('Status: Idle')bm:Set('Target: None')W:Set(
+'Timer: --')end X:Set('Total Resources: '..f)for bo,bp in pairs(Z)do bp:Set(bo..
+': '..tostring(e[bo]or 0))end end)task.wait(0.5)end end)task.spawn(function()
+while aD do if am.StorageActionInProgress then b=nil task.wait(0.5)continue end
+if not az and not am.AutoFarmCrops and not am.AutoWater and not am.AutoPlant
+then b=nil task.wait(1)continue end local bo=ah.Character local bp=bo and bo:
+FindFirstChild('HumanoidRootPart')if not bp then b=nil task.wait(0.5)continue
+end local _=tick()if _<c then b=nil task.wait(0.1)continue end safeCall(
+'TargetingLoop',function()if aI and not isValidInstance(aI.Instance)then local
+bq=aI.Type if bq and I[bq]then p[bq]=(p[bq]or 0)+1 if am.Debug then debugLog(
+'Node mined: '..bq..' (total: '..p[bq]..')')end end c=tick()+am.TeleportDelay aI
+=nil b=nil return end local bq,br=nil,math.huge local bs=bp.Position for bt,bu
+in ipairs(ay)do if isValidInstance(bu.Instance)and not bu.IsBlacklisted and bu.
+IsFarmTarget then local bv=I[bu.Type]~=nil if bv and m then if not
+shouldPrioritizeResource(bu.Type)then continue end end local bw=(bs-bu.Position)
+.Magnitude if bw<br then br=bw bq=bu end end end local bt=bq if s and
+isValidInstance(s)then for bu,bv in ipairs(ay)do if bv.Instance==s and not bv.
+IsBlacklisted then bt=bv break end end if not bt or bt.Instance~=s then s=nil bt
+=bq end else s=nil end if bq and m and not s then local bu=bq.Type local bv=I[bu
+]~=nil if bv then local bw=math.max(n[bu]or 1,0.001)local bx=q and(p[bu]or 0)or(
+o[bu]or 0)local by=bx/bw local bz=by for bA,bB in ipairs(ay)do if bB==bq then
+continue end if not(isValidInstance(bB.Instance)and not bB.IsBlacklisted and bB.
+IsFarmTarget)then continue end local bC=bB.Type local bD=I[bC]~=nil if not bD
+then continue end if not shouldPrioritizeResource(bC)then continue end local bE=
+math.max(n[bC]or 1,0.001)local bF=q and(p[bC]or 0)or(o[bC]or 0)local bG=bF/bE if
+(by-bG)>am.PriorityThreshold then if bG<bz then bz=bG bt=bB end end end if am.
+Debug and bt~=bq then debugLog(string.format(
+[[[Priority] Switching from %s (eff=%.1f) to %s (eff=%.1f), threshold=%d]],bu,by
+,bt.Type,bz,am.PriorityThreshold))end end end if not bt and m then for bu,bv in
+ipairs(ay)do if isValidInstance(bv.Instance)and not bv.IsBlacklisted and bv.
+IsFarmTarget then local bw=(bs-bv.Position).Magnitude if bw<br then br=bw bt=bv
+end end end end b=bt if bt and not s then s=bt.Instance if am.Debug then
+debugLog('[Priority] Committed to mining: '..(bt.Type or'unknown'))end end end)
+task.wait(0.1)end end)ad.Heartbeat:Connect(function()if not aD then return end
+if am.StorageActionInProgress then return end safeCall('Heartbeat',function()
+local bo=tick()if aI and isValidInstance(aI.Instance)then local bp=bo-aI.
+StartTime updateTimeoutVisuals(aI.Instance,bp)else updateTimeoutVisuals(nil,0)
+end local bp=ah.Character local bq=bp and bp:FindFirstChild('HumanoidRootPart')
+if not bq then return end local br=az or am.AutoFarmCrops or am.AutoWater or am.
+AutoPlant if not br then if bq and not aF and(bq.Anchored or bq:FindFirstChild(
+'AF_Stabilizer'))then bq.Anchored=false removeStabilizer(bq)end aI=nil return
+end if bo<c then bq.Anchored=true bq.AssemblyLinearVelocity=Vector3.zero M.
+Parent=nil return end local bs=b if bs then if not isValidInstance(bs.Instance)
+then b=nil return end local bt=bs.Instance local bu,bv,bw=getTargetData(bt)M.
+Position=bu M.Parent=af if not aI or aI.Instance~=bt then aI={Instance=bt,Model=
+bs.Model,Type=bs.Type,StartTime=bo,Farm=bs.Farm,UniqueID=bs.UniqueID}elseif(bo-
+aI.StartTime)>am.TimeoutSeconds then blacklistTarget(aI.Model)aI=nil b=nil
+scanForTargets()end manageESP()local bx=bu.Y-(bv.Y/2)local by=bu.Y+(bv.Y/2)local
+bz=by-1.5 local bA=am.TeleportMode if bA=='Underground'then if aI and aI.Type==
+'Big Wood'then bz=bx-5 elseif aI and aI.Type=='Water'then bz=by+1 elseif aI and
+aI.Type=='Wood'then bz=by+55 else bz=bx-5 end elseif bA=='Center'then bz=bu.Y
+else if bz<bu.Y then bz=bu.Y end end local bB=Vector3.new(bu.X,bz,bu.Z)local bC=
+(bq.Position-bB).Magnitude if bC>0.5 then if bC>50 then safeTeleport(bq,CFrame.
+new(bB)*CFrame.Angles(0,math.rad(bq.Orientation.Y),0))else bq.CFrame=CFrame.new(
+bB)*CFrame.Angles(0,math.rad(bq.Orientation.Y),0)bq.AssemblyLinearVelocity=
+Vector3.zero bq.AssemblyAngularVelocity=Vector3.zero _stabilizeRoot(bq)end else
+_stabilizeRoot(bq)end end end)end)task.spawn(function()local bo='Civilian'local
+bp=0 while aD do if t then local bq=ah.Character local br=bq and bq:
+FindFirstChild('HumanoidRootPart')local bs=br and br.Position or Vector3.zero
+local bt=tick()if bt-bp>2 then bp=bt local bu=af:FindFirstChild(ah.Name)local bv
+=bu and bu:FindFirstChild('Stats')local bw=bv and bv:FindFirstChild('Team')if bw
+and bw:IsA('StringValue')then bo=bw.Value end end for bu,bv in ipairs(ab:
+GetPlayers())do if bv==ah and not B then continue end local bw=bv.Character
+local bx=bw and bw:FindFirstChild('HumanoidRootPart')if not(bw and bx)then
+removePlayerBillboard(bv)removePlayerHighlight(bv)continue end local by=(bx.
+Position-bs).Magnitude if by>w then removePlayerBillboard(bv)
+removePlayerHighlight(bv)continue end local bz=getPlayerStats(bv.Name)if not bz
+then removePlayerBillboard(bv)removePlayerHighlight(bv)continue end local bA=
+getPlayerTeamRelation(bz.Team,bo)local bB=isPlayerKing(bv.Name,bz.Team)local bC=
+u[bv]if not bC then bC=createPlayerBillboard(bv)if bC then u[bv]=bC end end if
+bC then updatePlayerBillboard(bv,bC,bz,bA,bB,by)end if A then
+managePlayerHighlight(bv,bA,bB,x)else removePlayerHighlight(bv)end end else if
+next(u)or next(v)then cleanupAllPlayerESP()end end task.wait(0.5)end end)task.
+spawn(function()while aD do if C then for bo,bp in ipairs(ab:GetPlayers())do if
+bp==ah then continue end local bq=getPlayerStats(bp.Name)if bq and bq.Inventory
+then for br,bs in pairs(bq.Inventory)do if bs>=D then local bt=bp.Name..':'..br
+local bu=tick()local bv=F[bt]or 0 if bu-bv>30 then F[bt]=bu a:Notify({Title=
+'Suspicious Activity',Content=string.format('%s has %s %s!',bp.Name,bs,br),Type=
+'Warning',Duration=8,Urgent=true})if am.Debug then debugLog(string.format(
+'SUSPICIOUS: %s has %d %s',bp.Name,bs,br))end end end end end end end task.wait(
+E)end end)task.spawn(function()local bo=game:GetService('ReplicatedStorage'):
+WaitForChild('Remotes'):FindFirstChild('Storage')while aD do if G and bo then
+local bp=af:FindFirstChild('Buildings')if bp then local bq=0 for br,bs in
+ipairs(bp:GetChildren())do if not G then break end local bt=bs.Name:match(
+'^House(%d+)$')if bt then local bu=getHouseStorage(bt)if bu then pcall(function(
+)bo:FireServer('TakeAll',bu)end)bq=bq+1 task.wait(0.2)end end end if am.Debug
+and bq>0 then debugLog('Auto-Take All: Looted '..bq..' houses')end end end task.
+wait(math.max(5,H))end end)aP:OnDestroy(Cleanup)aP:OnDestroy(function()a:
+UnregisterKeybind('TogglePlayerESP')end)debugLog('v26+ Advanced Features Loaded'
+)
